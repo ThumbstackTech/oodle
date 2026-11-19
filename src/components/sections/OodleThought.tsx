@@ -264,7 +264,7 @@ export default function OodleThought() {
         </div>
       </div>
       {/* room for the tapes once the stage un-pins */}
-      <div aria-hidden className="h-[64px] sm:h-[130px] lg:h-[175px]" />
+      <div aria-hidden className="h-[140px] sm:h-[180px] lg:h-[220px]" />
     </section>
   );
 }

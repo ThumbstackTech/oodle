@@ -22,7 +22,7 @@ export default function SkillsStrip() {
   }, []);
 
   return (
-    <section id="games" aria-labelledby="skills-title" className="relative overflow-x-clip bg-cream pb-12 pt-8 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-32">
+    <section id="games" aria-labelledby="skills-title" className="relative overflow-x-clip bg-cream pb-14 pt-16 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-32">
       <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
         <div className="relative flex flex-col items-start">
           <h2
