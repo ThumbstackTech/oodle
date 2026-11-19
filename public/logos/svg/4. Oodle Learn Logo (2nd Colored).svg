@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 932.78 490.17">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-2 {
+        fill: #e4e1cf;
+      }
+
+      .cls-3 {
+        fill: #ea3d39;
+        font-size: 191.7px;
+      }
+
+      .cls-3, .cls-4 {
+        font-family: KidsMagicRegular, 'Kids Magic';
+      }
+
+      .cls-4 {
+        fill: #42171b;
+        font-size: 329.3px;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1" data-name="Layer 1">
+    <g>
+      <rect class="cls-2" x="431.76" y="265.59" width="497.25" height="174.71" rx="35.93" ry="35.93" transform="translate(-29.01 62.69) rotate(-5.17)"/>
+      <text class="cls-4" transform="translate(0 279.9)"><tspan x="0" y="0">oodle</tspan></text>
+      <text class="cls-3" transform="translate(463.86 438.81) rotate(-5.17)"><tspan x="0" y="0">l</tspan><tspan class="cls-1" x="41.21" y="0">e</tspan><tspan class="cls-5" x="146.27" y="0">arn</tspan></text>
+    </g>
+  </g>
+</svg>
