@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   title: "Oodle Learn — Play today. Ready for life tomorrow.",
   description:
     "Oodle Learn turns important life skills — money, problem-solving, feelings and entrepreneurship — into card games children aged 4–10 love to play.",
+  icons: {
+    icon: [{ url: "/brand/logo.svg", type: "image/svg+xml" }],
+    apple: "/logos/png/1. Oodle Learn Logo (Colored).png",
+  },
   openGraph: {
     title: "Oodle Learn — Big lessons. Little play.",
     description:
