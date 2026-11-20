@@ -1,44 +1,27 @@
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
-import { FRIENDLY, clientIp, notConfigured, hashIp, json, logError, rateLimit, readJson, sameOrigin, setAccessCookie, validate } from "@/lib/freebies-server";
 
+const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
-const MIN_FILL_MS = 2000;
-
+/** Saves a freebie registration. Always answers { ok: true } — failures are only logged server-side. */
 export async function POST(req: NextRequest) {
   try {
-    if (!sameOrigin(req)) return json({ ok: false, error: FRIENDLY.forbidden }, 403);
-
-    const ip = clientIp(req);
-    if (!rateLimit(`reg:${ip}`, 5, 10 * 60_000)) return json({ ok: false, error: FRIENDLY.rate }, 429);
-
-    const body = await readJson(req);
-    if (!body) return json({ ok: false, error: FRIENDLY.bad }, 400);
-
-    // Bots: honeypot filled or submitted impossibly fast → pretend success, store nothing.
-    const openedAt = Number(body.openedAt);
-    if ((typeof body.website === "string" && body.website.length > 0) || !Number.isFinite(openedAt) || Date.now() - openedAt < MIN_FILL_MS) {
-      return json({ ok: true });
+    const body = (await req.json()) as Record<string, unknown>;
+    const name = clean(body.name, 80);
+    const phone = clean(body.phone, 20);
+    const email = clean(body.email, 254).toLowerCase();
+    const freebie = clean(body.freebie, 60);
+    if (name && phone && email && freebie) {
+      await ensureSchema();
+      await sql()`
+        INSERT INTO freebie_registrations (name, phone, email, freebie)
+        VALUES (${name}, ${phone}, ${email}, ${freebie})
+        ON CONFLICT DO NOTHING`;
     }
-
-    const { data, errors } = validate(body);
-    if (!data) return json({ ok: false, error: FRIENDLY.bad, errors }, 400);
-
-    const off = notConfigured("register", { db: true, secret: true });
-    if (off) return off;
-
-    await ensureSchema();
-    const db = sql();
-    await db`
-      INSERT INTO freebie_registrations (name, phone, email, freebie, ip_hash)
-      VALUES (${data.name}, ${data.phone}, ${data.email}, ${data.freebie}, ${hashIp(ip)})
-      ON CONFLICT DO NOTHING`;
-
-    const res = json({ ok: true });
-    setAccessCookie(res);
-    return res;
   } catch (err) {
-    logError("register", err);
-    return json({ ok: false, error: FRIENDLY.generic }, 500);
+    const code = err && typeof err === "object" && "code" in err ? String((err as { code: unknown }).code) : err instanceof Error ? err.message.slice(0, 60) : "unknown";
+    console.error(`[freebies:register] ${code}`);
   }
+  return NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
 }

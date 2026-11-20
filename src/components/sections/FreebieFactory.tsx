@@ -8,7 +8,15 @@ import PatternBg from "../ui/PatternBg";
 import { MaskLines, Reveal } from "../ui/Reveal";
 
 type Item = (typeof freebies.items)[number];
-const FRIENDLY_ERROR = "Something went wrong — please try again.";
+const REGISTERED_KEY = "oodle-freebie-registered";
+
+function isRegistered(): boolean {
+  try {
+    return window.localStorage.getItem(REGISTERED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 /** Bento placement for the 5 cards (desktop 3-col grid). */
 const LAYOUT = [
@@ -19,7 +27,7 @@ const LAYOUT = [
   "lg:col-span-3", // full-width bottom
 ];
 
-const downloadUrl = (item: Item) => `/api/freebies/download/${item.slug}`;
+const downloadUrl = (item: Item) => encodeURI(item.file);
 
 /** fetch with a timeout; never throws — resolves to null on network failure / timeout. */
 async function safeFetch(url: string, init: RequestInit = {}, ms = 10_000): Promise<Response | null> {
@@ -158,13 +166,9 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
-  const [formError, setFormError] = useState("");
-  const [website, setWebsite] = useState(""); // honeypot
-  const openedAt = useRef(0);
   const firstRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    openedAt.current = Date.now();
     firstRef.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     const prev = document.documentElement.style.overflow;
@@ -184,32 +188,22 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
     if (!/^\+?[\d\s-]{10,15}$/.test(phone.trim())) next.phone = "Please enter a valid contact number.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = "Please enter a valid email.";
     setErrors(next);
-    setFormError("");
     if (Object.keys(next).length) return;
 
+    // Save in the background; the visitor always gets their download.
     setSending(true);
-    const res = await safeFetch("/api/freebies/register", {
+    await safeFetch("/api/freebies/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, email, freebie: item.slug, website, openedAt: openedAt.current }),
+      body: JSON.stringify({ name, phone, email, freebie: item.slug }),
     });
-    const data: { ok?: boolean; error?: string; errors?: Record<string, string> } = res ? await res.json().catch(() => ({})) : {};
     setSending(false);
-
-    if (res?.ok && data.ok) {
-      setSent(true);
-      startDownload(item);
-      window.setTimeout(onClose, 1800);
-      return;
-    }
-    if (res?.status === 400 && data.errors) {
-      const { freebie: _f, ...fields } = data.errors;
-      void _f;
-      setErrors(fields);
-      if (!Object.keys(fields).length) setFormError(data.error ?? FRIENDLY_ERROR);
-      return;
-    }
-    setFormError((res?.status === 429 || res?.status === 503) && data.error ? data.error : FRIENDLY_ERROR);
+    try {
+      window.localStorage.setItem(REGISTERED_KEY, "1");
+    } catch {}
+    setSent(true);
+    startDownload(item);
+    window.setTimeout(onClose, 1800);
   };
 
   return (
@@ -269,32 +263,6 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
                 <Field id="fr-email" label={f.email} type="email" value={email} onChange={setEmail} error={errors.email} autoComplete="email" inputMode="email" />
               </div>
 
-              {/* honeypot — hidden from people, tempting to bots */}
-              <input
-                type="text"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                aria-hidden
-                className="absolute left-[-9999px] h-px w-px opacity-0"
-              />
-
-              <AnimatePresence>
-                {formError && (
-                  <motion.p
-                    role="alert"
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="mt-5 rounded-[14px] border-2 border-tomato bg-tomato/10 px-4 py-2.5 text-center text-[13.5px] font-semibold text-ink"
-                  >
-                    {formError}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-
               <button
                 type="submit"
                 disabled={sending}
@@ -320,28 +288,11 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
  */
 export default function FreebieFactory() {
   const [picked, setPicked] = useState<Item | null>(null);
-  const [notice, setNotice] = useState("");
   const [before] = freebies.headline.split(freebies.highlight);
-
-  useEffect(() => {
-    if (!notice) return;
-    const t = window.setTimeout(() => setNotice(""), 3500);
-    return () => window.clearTimeout(t);
-  }, [notice]);
-
-  // Already registered (valid signed cookie)? download straight away. Otherwise ask first.
-  const pick = async (item: Item) => {
-    const res = await safeFetch(downloadUrl(item), { method: "HEAD" }, 6000);
-    if (res?.ok) startDownload(item);
-    else if (res?.status === 401) setPicked(item);
-    else
-      setNotice(
-        res?.status === 429
-          ? "Too many tries — please wait a minute."
-          : res?.status === 503
-            ? "Downloads are taking a short break — please try again soon."
-            : "Couldn't start the download — please try again.",
-      );
+  // Already registered in this browser? download straight away. Otherwise ask first.
+  const pick = (item: Item) => {
+    if (isRegistered()) startDownload(item);
+    else setPicked(item);
   };
 
   return (
@@ -376,19 +327,6 @@ export default function FreebieFactory() {
 
       <AnimatePresence>{picked && <RegisterModal item={picked} onClose={() => setPicked(null)} />}</AnimatePresence>
 
-      <AnimatePresence>
-        {notice && (
-          <motion.p
-            role="status"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8, transition: { duration: 0.15 } }}
-            className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-full border-[2.5px] border-ink bg-cream px-5 py-2.5 text-[14px] font-semibold text-ink shadow-[0_4px_0_0_var(--color-ink)]"
-          >
-            {notice}
-          </motion.p>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

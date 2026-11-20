@@ -457,6 +457,7 @@ export const freebies = {
       blurb: "Plan, budget and stretch ₹500 like a real money pro.", // [draft]
       tag: "Money Matters",
       slug: "my-500-challenge",
+      file: "/freebies/My 500 Challenge.pdf",
       world: "money" as World,
       shape: "coin" as Shape,
       pattern: "/patterns/money.svg",
@@ -468,6 +469,7 @@ export const freebies = {
       blurb: "Pause, think, then act — tricky situations to talk through together.", // [draft]
       tag: "Think It Through",
       slug: "think-it-through",
+      file: "/freebies/The Think it Through Challenge.pdf",
       world: "solve" as World,
       shape: "tri" as Shape,
       pattern: "/patterns/solve.svg",
@@ -479,6 +481,7 @@ export const freebies = {
       blurb: "From a big idea to a tiny business plan.", // [draft]
       tag: "Little Entrepreneurs",
       slug: "my-first-little-business",
+      file: "/freebies/My First Little Business.pdf",
       world: "biz" as World,
       shape: "blob" as Shape,
       pattern: "/patterns/biz.svg",
@@ -490,6 +493,7 @@ export const freebies = {
       blurb: "One small brave step a day, for a whole week.", // [draft]
       tag: "Think It Through",
       slug: "7-day-brave-challenge",
+      file: "/freebies/7 - Day Brave Challenge.pdf",
       world: "solve" as World,
       shape: "star" as Shape,
       pattern: "/patterns/letters-solve.svg",
@@ -501,6 +505,7 @@ export const freebies = {
       blurb: "Spot clues, solve puzzles, crack the case.", // [draft]
       tag: "Creative Corner",
       slug: "little-detectives",
+      file: "/freebies/The Little Detectives.pdf",
       world: "biz" as World,
       shape: "cloud" as Shape,
       pattern: "/patterns/letters-biz.svg",
