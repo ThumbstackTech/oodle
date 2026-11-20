@@ -154,17 +154,6 @@ function ColourMeInRow() {
   );
 }
 
-/** Row 3 — a faint ghost of the crew, cut off by the frame. */
-function GhostRow() {
-  return (
-    <div aria-hidden className="flex h-[clamp(32px,3.6vw,72px)] items-start justify-between overflow-hidden px-4 opacity-[0.13] mix-blend-luminosity sm:px-6 lg:px-[3.5vw]">
-      {CAST.map((m, i) => (
-        <Figure key={i} m={m} className={fit(i)} style={{ filter: "grayscale(1) brightness(2)" }} />
-      ))}
-    </div>
-  );
-}
-
 function InstagramIcon({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
@@ -234,9 +223,20 @@ export default function Footer() {
             <div className="mt-2">
               <ColourMeInRow />
             </div>
-            <div className="mt-3">
-              <GhostRow />
-            </div>
+          </div>
+
+          {/* Studio credit — under the character strip */}
+          <div className="relative flex justify-start px-6 pb-6 pt-9 sm:px-10 sm:pt-10 lg:px-14">
+            <a
+              href="https://thumbstack.co/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-[0.38em] text-[clamp(18px,1.6vw,23px)] font-medium leading-none text-[#ffffff] transition-opacity duration-200 hover:opacity-80"
+            >
+              A
+              <Image src="/brand/thumbstack.svg" alt="Thumbstack" width={84} height={11} loading="eager" className="h-[0.74em] w-auto" />
+              Website
+            </a>
           </div>
 
           {/* Bottom bar */}
