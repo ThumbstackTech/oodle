@@ -745,3 +745,64 @@ export const footer = {
     { world: "biz", shape: "tri" },
   ] as ({ world: World; shape: Shape } | { prop: PortalIcon })[],
 };
+
+/** "Get to Know Us" modal — verbatim from "Page 4: Behind the Games" in the website copy doc. */
+export const storyFull = {
+  kicker: "Behind the games",
+  headline: "It started with a mom, a little boy and a lot of questions.",
+  highlight: "a lot of questions.",
+  /** Story in chapters; `pull` marks a line to set as a big pull-quote. */
+  chapters: [
+    {
+      title: "Hi, I'm Olinda",
+      paras: [
+        "I'm Olinda, and Oodle Learn grew out of something that had been quietly sitting in my heart for a long time: an inclination towards entrepreneurship, a curiosity about how children learn and a desire to create something meaningful.",
+        "From a very young age, my son Orai and I would find ourselves talking about money, investing, earning and all the little ways the world works. His questions often made me pause. And somewhere along the way, I started thinking about how much children could discover if we simply gave them the opportunity.",
+      ],
+    },
+    {
+      title: "Two kinds of learning",
+      paras: [
+        "Growing up in a humble family, with both my parents working, I understood the value of discipline, education and hard work. But I also noticed that children who grow up around businesses often absorb a different kind of learning. They hear conversations about money, decisions, customers and ideas almost every day.",
+        "I wanted Orai to experience both: the grounding of a working family and the confidence to think independently, explore opportunities and believe in his own ideas.",
+      ],
+    },
+    {
+      title: "Beyond the lemonade stand",
+      paras: [
+        "We often came across the idea of children setting up little lemonade stands to learn about money and business. It got us talking about all the things children could learn by creating, selling and making decisions of their own.",
+        "But I began wondering: what other ways could we bring these experiences into everyday childhood?",
+      ],
+      pull: "What other ways could we bring these experiences into everyday childhood?",
+    },
+    {
+      title: "Our first playtester",
+      paras: [
+        "That question led me to start creating games. I worked on the ideas, structure and mechanics, while Orai became my first playtester, telling me what was fun, what wasn't and what needed another go.",
+        "And slowly, Oodle Learn began to take shape.",
+      ],
+    },
+    {
+      title: "Where we're headed",
+      paras: [
+        "Today, our ambition goes beyond teaching children a few new concepts. We want to encourage a growth mindset: the confidence to try, the curiosity to question, the willingness to learn from mistakes and the belief that abilities can grow with effort and experience.",
+        "We want children to be comfortable figuring things out, exploring possibilities and discovering what they're capable of.",
+      ],
+    },
+  ],
+  closing: [
+    "Because the most important lessons don't always begin in a classroom.",
+    "Sometimes, they begin with a question. A little curiosity. And a game.",
+    "That's what Oodle Learn is here for.",
+  ],
+  signoff: "Play today. Ready for life tomorrow.",
+  signature: "Olinda",
+  /** Milestones along the way (from the story) */
+  path: [
+    { label: "Questions at home", icon: "question" },
+    { label: "The lemonade-stand idea", icon: "coin" },
+    { label: "Making the games", icon: "puzzle" },
+    { label: "Orai, first playtester", icon: "star" },
+    { label: "Oodle Learn", icon: "trophy" },
+  ] as { label: string; icon: PortalIcon }[],
+};

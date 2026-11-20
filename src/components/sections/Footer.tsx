@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "motion/react";
-import { useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
+import { useRef, useState } from "react";
 import { footer } from "@/content/site";
 import { Particle } from "../portal/particles";
 import Oodle from "../ui/Oodle";
+import SpeechBubble from "../ui/SpeechBubble";
 
 type Member = (typeof footer.parade)[number];
 const CAST = footer.parade;
@@ -26,14 +28,74 @@ function Figure({ m, className = "", imgClass = "", style }: { m: Member; classN
   );
 }
 
+/** A loaf cat napping at the end of a strip. Hover (or tap) and it says meow. */
+function SleepyCat({ coloured = true }: { coloured?: boolean }) {
+  const [awake, setAwake] = useState(false);
+  const timer = useRef(0);
+  const meow = () => {
+    setAwake(true);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setAwake(false), 1600);
+  };
+  return (
+    <button
+      type="button"
+      aria-label="A sleepy cat. Meow!"
+      onPointerEnter={(e) => e.pointerType === "mouse" && meow()}
+      onClick={meow}
+      className="relative block shrink-0 cursor-pointer self-end overflow-visible"
+    >
+      <AnimatePresence>
+        {awake && (
+          <motion.span
+            initial={{ opacity: 0, y: 8, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.12 } }}
+            transition={{ type: "spring", duration: 0.4, bounce: 0.5 }}
+            style={{ originX: 0.5, originY: 1 }}
+            className="absolute bottom-[78%] left-[30%] z-10 -translate-x-1/2"
+          >
+            <SpeechBubble className="font-display !text-[16px] sm:!text-[18px]">meow!</SpeechBubble>
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <motion.span
+        className="block origin-bottom"
+        animate={awake ? { scaleY: [1, 1.08, 1], y: [0, -6, 0] } : { scaleY: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+      >
+        <Image
+          src="/oodles/extra/cat.svg"
+          alt=""
+          aria-hidden
+          width={340}
+          height={220}
+          draggable={false}
+          className={`pointer-events-none block h-[clamp(36px,3.6vw,80px)] w-auto select-none overflow-visible p-1 transition-[filter] duration-300 ${coloured ? "sticker" : ""}`}
+          style={coloured || awake ? undefined : { filter: UNCOLOURED }}
+        />
+      </motion.span>
+    </button>
+  );
+}
+
+/** How many figures fit per breakpoint (the sleepy cat always gets the last spot on top of these). */
+function fit(pos: number) {
+  if (pos >= 10) return "max-xl:hidden";
+  if (pos >= 8) return "max-lg:hidden";
+  if (pos >= 6) return "max-md:hidden";
+  if (pos >= 4) return "max-sm:hidden";
+  return "";
+}
+
 /** Row 1 — full colour, sticker outline, pops in, hops on hover. */
 function ColourRow() {
   return (
-    <div className="flex items-end justify-center gap-[clamp(4px,1.2vw,20px)] overflow-visible px-3 sm:px-5 lg:justify-between lg:gap-0 lg:px-[3.5vw]">
+    <div className="flex items-end justify-between overflow-visible px-4 sm:px-6 lg:px-[3.5vw]">
       {CAST.map((m, i) => (
         <motion.span
           key={i}
-          className="block shrink-0 origin-bottom overflow-visible"
+          className={`block shrink-0 origin-bottom overflow-visible ${fit(i)}`}
           initial={{ opacity: 0, y: 30, scale: 0.85 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "0px 0px -10% 0px" }}
@@ -43,6 +105,7 @@ function ColourRow() {
           <Figure m={m} imgClass="sticker" />
         </motion.span>
       ))}
+      <SleepyCat />
     </div>
   );
 }
@@ -61,8 +124,8 @@ function ColourMeInRow() {
     });
 
   return (
-    <div className="flex items-end justify-center gap-[clamp(4px,1.2vw,20px)] overflow-visible px-3 sm:px-5 lg:justify-between lg:gap-0 lg:px-[3.5vw]">
-      {reversed.map(({ m, i }) => {
+    <div className="flex items-end justify-between overflow-visible px-4 sm:px-6 lg:px-[3.5vw]">
+      {reversed.map(({ m, i }, pos) => {
         const on = done.has(i);
         const isProp = "prop" in m;
         return (
@@ -74,7 +137,7 @@ function ColourMeInRow() {
             aria-hidden={isProp || undefined}
             onPointerEnter={(e) => e.pointerType === "mouse" && colour(i)}
             onClick={() => toggle(i)}
-            className="block shrink-0 cursor-pointer self-end overflow-visible transition-transform duration-200 ease-(--ease-out) active:scale-95"
+            className={`block shrink-0 cursor-pointer self-end overflow-visible transition-transform duration-200 ease-(--ease-out) active:scale-95 ${fit(pos)}`}
           >
             <Figure
               m={m}
@@ -84,6 +147,7 @@ function ColourMeInRow() {
           </button>
         );
       })}
+      <SleepyCat coloured={false} />
     </div>
   );
 }
@@ -91,9 +155,9 @@ function ColourMeInRow() {
 /** Row 3 — a faint ghost of the crew, cut off by the frame. */
 function GhostRow() {
   return (
-    <div aria-hidden className="flex h-[clamp(32px,3.6vw,72px)] items-start justify-center gap-[clamp(4px,1.2vw,20px)] overflow-hidden px-3 opacity-[0.13] mix-blend-luminosity sm:px-5 lg:justify-between lg:gap-0 lg:px-[3.5vw]">
+    <div aria-hidden className="flex h-[clamp(32px,3.6vw,72px)] items-start justify-between overflow-hidden px-4 opacity-[0.13] mix-blend-luminosity sm:px-6 lg:px-[3.5vw]">
       {CAST.map((m, i) => (
-        <Figure key={i} m={m} style={{ filter: "grayscale(1) brightness(2)" }} />
+        <Figure key={i} m={m} className={fit(i)} style={{ filter: "grayscale(1) brightness(2)" }} />
       ))}
     </div>
   );
@@ -124,9 +188,9 @@ export default function Footer() {
           {/* Top: brand + links */}
           <div className="relative grid gap-10 px-6 pb-6 pt-10 sm:px-10 sm:pt-12 lg:grid-cols-12 lg:gap-8 lg:px-14 lg:pt-14">
             <div className="lg:col-span-6">
-              <a href="#top" aria-label="Oodle Learn — back to top" className="relative block h-14 w-[126px] sm:h-16 sm:w-[144px]">
+              <Link href="/" scroll aria-label="Oodle Learn — home" className="relative block h-14 w-[126px] sm:h-16 sm:w-[144px]">
                 <Image src="/brand/logo-light.svg" alt="Oodle Learn" fill sizes="150px" className="object-contain object-left" />
-              </a>
+              </Link>
               <p className="mt-5 max-w-[16ch] font-display text-[clamp(1.8rem,3.4vw,3rem)] leading-[0.98]">
                 {footer.tagline.lead} <span className="text-sun">{footer.tagline.word}</span>
               </p>

@@ -1,16 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { nav } from "@/content/site";
 import { Button } from "./ui/Button";
 import Oodle from "./ui/Oodle";
 
 /** Official Oodle Learn logo (public/brand). `light` swaps to the cream version for dark backgrounds. */
-function Wordmark({ light = false }: { light?: boolean }) {
+function Wordmark({ light = false, href = "/", onClick }: { light?: boolean; href?: string; onClick?: () => void }) {
   return (
-    <a href="#top" aria-label="Oodle Learn — home" className="group relative block h-10 w-[90px] shrink-0 sm:h-11 sm:w-[99px]">
+    <Link href={href} scroll onClick={onClick} aria-label="Oodle Learn — home" className="group relative block h-10 w-[90px] shrink-0 sm:h-11 sm:w-[99px]">
       <Image
         src="/brand/logo.svg"
         alt="Oodle Learn"
@@ -28,7 +30,7 @@ function Wordmark({ light = false }: { light?: boolean }) {
         sizes="100px"
         className={`object-contain object-left transition-[opacity,transform] duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-3 ${light ? "opacity-100" : "opacity-0"}`}
       />
-    </a>
+    </Link>
   );
 }
 
@@ -36,6 +38,8 @@ const EASE = [0.23, 1, 0.32, 1] as const;
 
 /** `onDark`: the nav starts over a dark hero, so links/wordmark are cream until the bar turns solid on scroll. */
 export default function Nav({ onDark = false }: { onDark?: boolean }) {
+  const onHome = usePathname() === "/";
+  const to = (h: string) => (onHome || !h.startsWith("#") ? h : `/${h}`);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -68,7 +72,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
             {nav.links.slice(1).map((l) => (
               <li key={l.href}>
                 <a
-                  href={l.href}
+                  href={to(l.href)}
                   className={`whitespace-nowrap rounded-full px-3 py-2 text-[14px] font-semibold transition-colors duration-200 ${
                     onDark && !scrolled ? "text-cream/85 hover:bg-cream/10 hover:text-cream" : "text-ink/80 hover:bg-ink/[0.07] hover:text-ink"
                   }`}
@@ -81,7 +85,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
 
           <div className="flex items-center gap-2">
             <div className="hidden pb-[5px] sm:block">
-              <Button href={nav.cta.href} size="sm">
+              <Button href={to(nav.cta.href)} size="sm">
                 {nav.cta.label}
               </Button>
             </div>
@@ -115,7 +119,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
             className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-lilac px-5 pb-8 pt-5 lg:hidden"
           >
             <div className="flex items-center justify-between">
-              <Wordmark light />
+              <Wordmark light onClick={() => setOpen(false)} />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -135,7 +139,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
                   animate={{ opacity: 1, y: 0, transition: { type: "spring", duration: 0.5, bounce: 0.25, delay: 0.12 + i * 0.05 } }}
                 >
                   <a
-                    href={l.href}
+                    href={to(l.href)}
                     onClick={() => setOpen(false)}
                     className="block py-2 font-display text-[clamp(34px,10vw,52px)] leading-[1.05] text-cream"
                   >
@@ -145,7 +149,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
               ))}
             </ul>
             <div className="mt-auto">
-              <Button href={nav.cta.href} className="w-full">
+              <Button href={to(nav.cta.href)} className="w-full">
                 {nav.cta.label}
               </Button>
             </div>

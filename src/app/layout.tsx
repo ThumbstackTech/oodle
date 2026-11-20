@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Providers from "@/components/Providers";
+import StructuredData from "@/components/StructuredData";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const kidsMagic = localFont({
@@ -22,19 +24,46 @@ const poppins = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Oodle Learn — Play today. Ready for life tomorrow.",
-  description:
-    "Oodle Learn turns important life skills — money, problem-solving, feelings and entrepreneurship — into card games children aged 4–10 love to play.",
-  icons: {
-    icon: [{ url: "/brand/logo.svg", type: "image/svg+xml" }],
-    apple: "/logos/png/1. Oodle Learn Logo (Colored).png",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_TITLE, template: `%s · ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "life skills games for kids",
+    "financial literacy card game",
+    "money game for kids India",
+    "emotional intelligence game",
+    "entrepreneurship game for kids",
+    "educational card games",
+    "growth mindset",
+    "Master Money",
+    "Master Solutions",
+    "Master Biz",
+  ],
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
   openGraph: {
-    title: "Oodle Learn — Big lessons. Little play.",
-    description:
-      "Card games that help children explore money, feelings, problem-solving and big ideas. Made in India.",
     type: "website",
+    url: "/",
+    siteName: SITE_NAME,
+    locale: "en_IN",
+    title: "Oodle Learn — Big lessons. Little play.",
+    description: SITE_DESCRIPTION,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Oodle Learn — Big lessons. Little play.",
+    description: SITE_DESCRIPTION,
+  },
+  category: "education",
+  formatDetection: { telephone: false, email: false, address: false },
 };
 
 export const viewport: Viewport = {
@@ -43,8 +72,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${kidsMagic.variable} ${poppins.variable} antialiased`}>
+    <html lang="en-IN" className={`${kidsMagic.variable} ${poppins.variable} antialiased`}>
       <body>
+        <StructuredData />
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -3,13 +3,19 @@ import postgres from "postgres";
 
 type Sql = ReturnType<typeof postgres>;
 
-const g = globalThis as unknown as { __oodleSql?: Sql; __oodleSchema?: Promise<void> };
+const g = globalThis as unknown as { __oodleSql?: Sql; __oodleSqlUrl?: string; __oodleSchema?: Promise<void> };
 
 /** Lazily-created, process-wide client (cached across dev hot reloads). Never logs the URL. */
 export function sql(): Sql {
-  if (g.__oodleSql) return g.__oodleSql;
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DB_NOT_CONFIGURED");
+  if (g.__oodleSql && g.__oodleSqlUrl === url) return g.__oodleSql;
+  // URL changed (e.g. .env edited during dev) — drop the old pool and its schema check.
+  if (g.__oodleSql) {
+    void g.__oodleSql.end({ timeout: 1 }).catch(() => {});
+    g.__oodleSchema = undefined;
+  }
+  g.__oodleSqlUrl = url;
   // SSL: honour ?sslmode=… in the URL if present; otherwise try SSL and fall back ("prefer").
   let sslFromUrl = false;
   try {

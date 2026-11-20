@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
 
 type Tone = "sun" | "cream" | "ink";
 
@@ -18,6 +18,7 @@ export function Button({
   size = "md",
   className = "",
   disabled = false,
+  onClick,
 }: {
   href: string;
   children: ReactNode;
@@ -26,6 +27,8 @@ export function Button({
   className?: string;
   /** Renders inert (no link, not focusable) and visibly muted. */
   disabled?: boolean;
+  /** Optional click handler (e.g. open a modal instead of navigating). */
+  onClick?: (e: ReactMouseEvent<HTMLAnchorElement>) => void;
 }) {
   const sizes = size === "sm" ? "h-10 pl-4 pr-1.5 text-[14px] gap-2.5" : "h-[52px] pl-6 pr-2 text-[15px] gap-3";
   return (
@@ -33,6 +36,7 @@ export function Button({
       href={disabled ? undefined : href}
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : undefined}
+      onClick={onClick}
       className={`group inline-flex items-center justify-between whitespace-nowrap rounded-full border-[2.5px] border-ink font-semibold shadow-[0_5px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] ease-(--ease-out) active:translate-y-[5px] active:shadow-[0_0_0_0_var(--color-ink)] [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5 [@media(hover:hover)_and_(pointer:fine)]:hover:shadow-[0_7px_0_0_var(--color-ink)] ${TONES[tone]} ${sizes} ${disabled ? "pointer-events-none opacity-55 saturate-50" : ""} ${className}`}
     >
       {children}

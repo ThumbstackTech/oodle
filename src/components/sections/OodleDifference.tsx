@@ -1,13 +1,26 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { difference } from "@/content/site";
 import { Particle } from "../portal/particles";
 import Oodle from "../ui/Oodle";
 import { MaskLines, Reveal } from "../ui/Reveal";
 
 const REST_TILT = [-5.5, 3.2, -3.8, 4.2, -3.2];
+
+const DESKTOP_MQ = "(min-width: 1024px)";
+function useIsDesktop() {
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia(DESKTOP_MQ);
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia(DESKTOP_MQ).matches,
+    () => true,
+  );
+}
 const REST_Y = [10, -8, 16, -6, 12];
 const ACTIVE_TILT = [-2, 1.5, -1.5, 2, -1.5];
 
@@ -33,17 +46,20 @@ function TraitCard({
   onEnter: () => void;
   onToggle: () => void;
 }) {
+  const desktop = useIsDesktop();
   const isHovered = active === i;
-  const shiftX = active === null || active === i ? 0 : i < active ? -16 : 16;
-  const targetRotate = isHovered ? ACTIVE_TILT[i] : REST_TILT[i];
-  const targetY = isHovered ? REST_Y[i] - 20 : REST_Y[i];
-  const targetScale = isHovered ? 1.06 : 1;
+  // On phones the cards sit in a horizontal scroller, which clips anything that moves vertically —
+  // so they stay level and only lift a little; the fanned tilt/stagger is desktop-only.
+  const shiftX = !desktop || active === null || active === i ? 0 : i < active ? -16 : 16;
+  const targetRotate = desktop ? (isHovered ? ACTIVE_TILT[i] : REST_TILT[i]) : isHovered ? ACTIVE_TILT[i] : 0;
+  const targetY = desktop ? (isHovered ? REST_Y[i] - 20 : REST_Y[i]) : isHovered ? -10 : 0;
+  const targetScale = isHovered ? (desktop ? 1.06 : 1.03) : 1;
 
   return (
     <motion.li
       className="relative w-[min(72vw,260px)] shrink-0 snap-center sm:w-[240px] lg:-mx-2 lg:w-[clamp(205px,18.2vw,258px)]"
       style={{ zIndex: isHovered ? 30 : 10 + (i % 2) }}
-      initial={{ opacity: 0, y: 90, rotate: REST_TILT[i] * 1.5 }}
+      initial={{ opacity: 0, y: desktop ? 90 : 40, rotate: desktop ? REST_TILT[i] * 1.5 : 0 }}
       whileInView={{ opacity: 1, y: 0, rotate: 0 }}
       viewport={{ once: true, margin: "0px 0px -12% 0px" }}
       transition={{ type: "spring", duration: 0.85, bounce: 0.24, delay: i * 0.07 }}
@@ -167,7 +183,7 @@ export default function OodleDifference() {
         {/* The fanned card row */}
         <ul
           onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
-          className="no-scrollbar -mx-5 mt-6 flex snap-x snap-mandatory items-center gap-5 overflow-x-auto px-6 pb-12 pt-8 sm:-mx-8 sm:mt-8 sm:px-10 sm:pb-14 sm:pt-12 lg:mx-0 lg:justify-center lg:gap-0 lg:overflow-visible lg:px-0"
+          className="no-scrollbar -mx-5 mt-6 flex touch-pan-x snap-x snap-mandatory items-center gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain px-6 pb-14 pt-10 sm:-mx-8 sm:mt-8 sm:px-10 sm:pb-14 sm:pt-12 lg:mx-0 lg:justify-center lg:gap-0 lg:overflow-visible lg:px-0"
         >
           {difference.traits.map((t, i) => (
             <TraitCard

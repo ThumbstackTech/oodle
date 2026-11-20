@@ -1,9 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion, useAnimate, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { story } from "@/content/site";
 import { Button } from "../ui/Button";
+import StoryModal from "./StoryModal";
 import Oodle from "../ui/Oodle";
 import { MaskLines, Reveal } from "../ui/Reveal";
 
@@ -60,13 +61,19 @@ function Bubble({ text, slot, delay }: { text: string; slot: (typeof SLOTS)[numb
 export default function OodleStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  // Draws as the section scrolls through: starts when it enters, finishes a little past the middle.
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end 30%"] });
+  // Draws as soon as the section enters and is fully drawn by the time it is centred on screen.
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start 95%", "center 55%"] });
   const drawn = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1]), { stiffness: 90, damping: 24, mass: 0.4 });
   const [shown, setShown] = useState<string[]>(() => story.questions.slice(0, SLOTS.length));
   const next = useRef(SLOTS.length);
   const turn = useRef(0);
   const [boyScope, animateBoy] = useAnimate();
+  const [storyOpen, setStoryOpen] = useState(false);
+  const ctaRef = useRef<HTMLElement | null>(null);
+  const closeStory = useCallback(() => {
+    setStoryOpen(false);
+    requestAnimationFrame(() => ctaRef.current?.focus({ preventScroll: true }));
+  }, []);
   const [before] = story.headline.split(story.highlight);
 
   const ask = () => {
@@ -120,7 +127,16 @@ export default function OodleStory() {
             ))}
           </div>
           <Reveal delay={0.18} className="mt-[clamp(28px,4.5svh,48px)]">
-            <Button href={story.cta.href}>{story.cta.label}</Button>
+            <Button
+              href={story.cta.href}
+              onClick={(e) => {
+                e.preventDefault();
+                ctaRef.current = e.currentTarget;
+                setStoryOpen(true);
+              }}
+            >
+              {story.cta.label}
+            </Button>
           </Reveal>
         </div>
 
@@ -173,6 +189,7 @@ export default function OodleStory() {
           </div>
         </div>
       </div>
+      <AnimatePresence>{storyOpen && <StoryModal onClose={closeStory} />}</AnimatePresence>
     </section>
   );
 }

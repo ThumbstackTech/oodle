@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState, type CSSProperties } from "react";
+import { sayings } from "@/content/site";
 import Oodle from "../ui/Oodle";
+import SpeechBubble from "../ui/SpeechBubble";
 import HeroHeading from "./HeroHeading";
 import { WORLDS } from "./worlds";
 
@@ -29,13 +31,16 @@ export default function HeroWorldRemote() {
   const [active, setActive] = useState(0);
   const [layers, setLayers] = useState<Layer[]>([{ i: 0, key: 0, origin: { x: "50%", y: "70%" } }]);
   const [hovering, setHovering] = useState(false);
+  // which cast member is being hovered / tapped (null = none)
+  const [poked, setPoked] = useState<number | null>(null);
   const [stopped, setStopped] = useState(false);
   // Bumped on every world change so the timer bar restarts from zero.
   const [tick, setTick] = useState(0);
 
-  const paused = hovering || stopped || !inView || !!reduce;
+  const paused = hovering || poked !== null || stopped || !inView || !!reduce;
 
   const go = (i: number) => {
+    setPoked(null);
     setTick((t) => t + 1);
     if (i === active) return;
     const tab = tabRefs.current[i];
@@ -175,7 +180,10 @@ export default function HeroWorldRemote() {
       </div>
 
       {/* The cast — cream sticker outline keeps every Oodle readable on every world */}
-      <div className="relative z-20 flex h-[clamp(96px,min(26svh,23vw),220px)] items-end justify-center gap-[3vw] px-3 max-sm:h-[clamp(96px,26vw,130px)] sm:gap-[1.5vw]">
+      <div
+        className={`relative flex h-[clamp(96px,min(26svh,23vw),220px)] ${poked !== null ? "z-40" : "z-20"} items-end justify-center gap-[3vw] px-3 max-sm:h-[clamp(96px,26vw,130px)] sm:gap-[1.5vw]`}
+        onPointerLeave={(e) => e.pointerType === "mouse" && setPoked(null)}
+      >
         <AnimatePresence mode="popLayout">
           {w.cast.map((shape, k) => (
             <motion.div
@@ -186,11 +194,84 @@ export default function HeroWorldRemote() {
               exit={{ y: "110%", transition: { duration: 0.2, ease: [0.7, 0, 0.84, 0], delay: k * 0.015 } }}
               transition={{ type: "spring", duration: 0.65, bounce: 0.35, delay: 0.15 + k * 0.04 }}
             >
-              <Oodle world={w.id} shape={shape} priority className="sticker h-full w-auto" sizes="220px" />
+              <CastMember
+                world={w.id}
+                shape={shape}
+                k={k}
+                last={k === w.cast.length - 1}
+                poked={poked}
+                onEnter={() => setPoked(k)}
+                onTap={() => setPoked((p) => (p === k ? null : k))}
+              />
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
     </section>
+  );
+}
+
+/**
+ * One member of the hero cast. Hover (or tap) and it springs up and says one of its lines;
+ * its neighbours lean away to make room. The slideshow pauses while someone's being poked.
+ */
+function CastMember({
+  world,
+  shape,
+  k,
+  last,
+  poked,
+  onEnter,
+  onTap,
+}: {
+  world: (typeof WORLDS)[number]["id"];
+  shape: (typeof WORLDS)[number]["cast"][number];
+  k: number;
+  last: boolean;
+  poked: number | null;
+  onEnter: () => void;
+  onTap: () => void;
+}) {
+  const on = poked === k;
+  const near = poked !== null && Math.abs(poked - k) === 1;
+  const dir = poked !== null && k > poked ? 1 : -1;
+  const lines = sayings[`${world}-${shape}`] ?? [];
+  const line = lines[k % Math.max(lines.length, 1)];
+
+  return (
+    <motion.button
+      type="button"
+      aria-label={line ? `Oodle says: ${line}` : "Oodle"}
+      onPointerEnter={(e) => e.pointerType === "mouse" && onEnter()}
+      // touch/pen: tap toggles · keyboard: Enter/Space toggles · mouse: hover already handles it
+      onPointerUp={(e) => e.pointerType !== "mouse" && onTap()}
+      onClick={(e) => e.detail === 0 && onTap()}
+      className="relative block h-full cursor-pointer outline-none"
+      animate={
+        on
+          ? { y: "-14%", scale: 1.1, rotate: k % 2 ? 4 : -4, x: 0 }
+          : near
+            ? { y: "2%", scale: 0.96, rotate: dir * 7, x: `${dir * 6}%` }
+            : { y: 0, scale: 1, rotate: 0, x: 0 }
+      }
+      transition={{ type: "spring", duration: 0.45, bounce: 0.4 }}
+      style={{ originY: 1 }}
+    >
+      <AnimatePresence>
+        {on && line && (
+          <motion.span
+            initial={{ opacity: 0, y: 8, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.12 } }}
+            transition={{ type: "spring", duration: 0.4, bounce: 0.45 }}
+            style={{ originX: k === 0 ? 0 : last ? 1 : 0.5, originY: 1 }}
+            className={`pointer-events-none absolute bottom-[88%] z-30 ${k === 0 ? "left-0" : last ? "right-0" : k === 3 ? "left-1/2 -translate-x-1/2 max-sm:left-auto max-sm:right-0 max-sm:translate-x-0" : "left-1/2 -translate-x-1/2"}`}
+          >
+            <SpeechBubble className="max-sm:!px-2.5 max-sm:!py-1.5 max-sm:!text-[11.5px]">{line}</SpeechBubble>
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <Oodle world={world} shape={shape} priority className="sticker h-full w-auto" sizes="220px" />
+    </motion.button>
   );
 }

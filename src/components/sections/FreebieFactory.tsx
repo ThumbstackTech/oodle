@@ -221,7 +221,7 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[90] flex items-end justify-center p-3 sm:items-center sm:p-6"
+      className="fixed inset-0 z-[90] flex items-stretch justify-center sm:items-center sm:p-6 sm:pt-24"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
@@ -231,27 +231,29 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="freebie-form-title"
-        className="relative w-full max-w-[460px] rounded-[30px] border-[3px] border-ink bg-cream p-6 pt-14 text-ink shadow-[0_10px_0_0_var(--color-ink)] sm:p-8 sm:pt-16"
+        className="relative flex h-[100dvh] w-full flex-col bg-cream text-ink sm:h-auto sm:max-h-[calc(100svh-8rem)] sm:max-w-[460px] sm:rounded-[30px] sm:border-[3px] sm:border-ink sm:shadow-[0_10px_0_0_var(--color-ink)]"
         initial={{ y: 40, scale: 0.96, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: 20, scale: 0.98, opacity: 0, transition: { duration: 0.15 } }}
         transition={{ type: "spring", duration: 0.5, bounce: 0.25 }}
       >
         {/* Oodle peeking over the top */}
-        <div className="pointer-events-none absolute -top-16 left-1/2 w-[110px] -translate-x-1/2">
+        <div className="pointer-events-none absolute left-1/2 top-5 z-10 w-[96px] -translate-x-1/2 sm:-top-16 sm:w-[110px]">
           <Oodle world={item.world} shape={item.shape} className="sticker h-auto w-full" sizes="120px" />
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-cream transition-transform duration-[120ms] active:scale-95"
+          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-cream transition-transform duration-[120ms] active:scale-95"
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
             <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
           </svg>
         </button>
 
+        {/* the form scrolls inside the card on short screens; the Oodle + close stay put */}
+        <div data-lenis-prevent className="oodle-scroll mt-32 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-6 pb-8 pt-2 [justify-content:safe_center] sm:mt-0 sm:block sm:px-8 sm:pb-8 sm:pt-16">
         <AnimatePresence mode="wait" initial={false}>
           {sent ? (
             <motion.div key="done" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="py-6 text-center">
@@ -313,6 +315,7 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
             </motion.form>
           )}
         </AnimatePresence>
+        </div>
       </motion.div>
     </motion.div>
   );

@@ -11,6 +11,8 @@ import { Block, Coin, GameCard, Token } from "./pieces";
 
 const { Engine, Bodies, Body, Composite, Constraint, Sleeping } = Matter;
 
+const MAX_SPEED = 28;
+
 // Collision categories: pieces fall *through* the headline on the way in, then start colliding with it.
 const CAT_WORLD = 0x0001;
 const CAT_TEXT = 0x0002;
@@ -115,6 +117,15 @@ export default function ToyBox({
     let drag: { constraint: Matter.Constraint; index: number; x0: number; y0: number; t0: number; moved: boolean } | null = null;
     let builtWidth = 0;
     let zoneTop = 0;
+    // Top surface of each tilted floor, so toys can never be dragged or flung through a tape.
+    let floors: { cx: number; topC: number; tan: number; l: number; r: number }[] = [];
+    const floorTop = (x: number) => {
+      let y = Infinity;
+      for (const fl of floors) if (x >= fl.l && x <= fl.r) y = Math.min(y, fl.topC + (x - fl.cx) * fl.tan);
+      return y;
+    };
+    let floorY = 0;
+    let entered: boolean[] = [];
     const cleanups: (() => void)[] = [];
 
     const render = () => {
@@ -147,13 +158,34 @@ export default function ToyBox({
       bodies.forEach((b, i) => {
         if (b.collisionFilter.mask === FALLING.mask && b.position.y - sizes[i].h / 2 > zoneTop) b.collisionFilter = { ...LANDED, group: 0 };
       });
-      // Rescue anything flung out of bounds.
+      // Hard containment: nothing can leave the play area, however hard it's thrown.
       const W = hero.clientWidth;
-      const H = hero.clientHeight;
-      bodies.forEach((b) => {
-        if (b.position.y > H + 600 || b.position.x < -300 || b.position.x > W + 300) {
-          Body.setPosition(b, { x: W / 2, y: -100 });
-          Body.setVelocity(b, { x: 0, y: 0 });
+      bodies.forEach((b, i) => {
+        // cap speed so fast throws can't tunnel through walls
+        const v = b.velocity;
+        const sp = Math.hypot(v.x, v.y);
+        if (sp > MAX_SPEED) Body.setVelocity(b, { x: (v.x / sp) * MAX_SPEED, y: (v.y / sp) * MAX_SPEED });
+        const hw = sizes[i].w / 2;
+        const hh = sizes[i].h / 2;
+        if (!entered[i] && b.position.y - hh >= 0) entered[i] = true;
+        let { x, y } = b.position;
+        let vx = b.velocity.x;
+        let vy = b.velocity.y;
+        let hit = false;
+        if (x < hw) { x = hw; vx = Math.abs(vx) * 0.4; hit = true; }
+        if (x > W - hw) { x = W - hw; vx = -Math.abs(vx) * 0.4; hit = true; }
+        if (entered[i] && y < hh) { y = hh; vy = Math.abs(vy) * 0.4; hit = true; }
+        if (y > floorY - hh) { y = floorY - hh; vy = -Math.abs(vy) * 0.3; hit = true; }
+        // never below a tape: if the centre slips under a tape's surface, pop it back on top
+        const tapeTop = floorTop(x);
+        if (tapeTop !== Infinity && y > tapeTop + 2) {
+          y = tapeTop - (b.bounds.max.y - b.bounds.min.y) / 2;
+          vy = Math.min(vy, 0) * 0.3;
+          hit = true;
+        }
+        if (hit) {
+          Body.setPosition(b, { x, y });
+          Body.setVelocity(b, { x: vx, y: vy });
         }
       });
       render();
@@ -187,26 +219,35 @@ export default function ToyBox({
       engine.gravity.y = 1.1;
 
       const heroBox = hero.getBoundingClientRect();
+      floorY = hero.querySelector("[data-floor]") ? H + 260 : H;
+      entered = pieces.map(() => settle);
       const statics: Matter.Body[] = [
-        Bodies.rectangle(W / 2, (hero.querySelector("[data-floor]") ? H + 260 : H) + 60, W * 3, 120, { isStatic: true }),
-        Bodies.rectangle(-60, H / 2 - 1500, 120, H + 3000, { isStatic: true }),
-        Bodies.rectangle(W + 60, H / 2 - 1500, 120, H + 3000, { isStatic: true }),
+        // thick walls + ceiling so nothing tunnels out
+        Bodies.rectangle(W / 2, floorY + 200, W * 3, 400, { isStatic: true }),
+        Bodies.rectangle(-200, H / 2 - 1500, 400, H + 3600, { isStatic: true }),
+        Bodies.rectangle(W + 200, H / 2 - 1500, 400, H + 3600, { isStatic: true }),
       ];
       zoneTop = 0;
+      floors = [];
       // Tilted floors (e.g. the skill tapes): the wrapper is unrotated, the tilt comes from data-angle,
       // so the physics surface matches the band exactly and toys settle along it.
       hero.querySelectorAll<HTMLElement>("[data-floor]").forEach((el) => {
         const r = el.getBoundingClientRect();
         if (!r.width || !r.height) return;
         const angle = (Number(el.dataset.angle ?? 0) * Math.PI) / 180;
+        const cx = r.left - heroBox.left + r.width / 2;
+        const cy = r.top - heroBox.top + r.height / 2;
+        // Make the floor deep (extends 600px below the band) so nothing can tunnel through it.
+        const deep = 600;
         statics.push(
-          Bodies.rectangle(r.left - heroBox.left + r.width / 2, r.top - heroBox.top + r.height / 2, r.width, r.height, {
+          Bodies.rectangle(cx - Math.sin(angle) * (deep / 2), cy + Math.cos(angle) * (deep / 2), r.width, r.height + deep, {
             isStatic: true,
             angle,
             friction: 0.9,
             frictionStatic: 1,
           }),
         );
+        floors.push({ cx, topC: cy - r.height / 2 / Math.cos(angle), tan: Math.tan(angle), l: r.left - heroBox.left, r: r.right - heroBox.left });
       });
 
       // Text colliders: one box per row, each stretched down to meet the next row so nothing can wedge between lines.
@@ -250,9 +291,13 @@ export default function ToyBox({
     };
 
     // --- Pointer: grab, drag, throw, tap ---
+    // pointer positions are clamped to the play area, so a dragged toy can't be pulled outside it
     const toWorld = (e: PointerEvent) => {
       const r = hero.getBoundingClientRect();
-      return { x: e.clientX - r.left, y: e.clientY - r.top };
+      return {
+        x: Math.min(Math.max(e.clientX - r.left, 0), hero.clientWidth),
+        y: Math.min(Math.max(e.clientY - r.top, 0), floorY || hero.clientHeight),
+      };
     };
     const onDown = (index: number) => (e: PointerEvent) => {
       if (!engine || drag) return;
@@ -280,7 +325,15 @@ export default function ToyBox({
     const onMove = (e: PointerEvent) => {
       if (!drag) return;
       if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 6) drag.moved = true;
-      drag.constraint.pointA = toWorld(e);
+      const p = toWorld(e);
+      const body = bodies[drag.index];
+      const top = floorTop(p.x);
+      if (body && top !== Infinity) {
+        const halfH = (body.bounds.max.y - body.bounds.min.y) / 2;
+        const grabOffsetY = drag.constraint.pointB?.y ?? 0;
+        p.y = Math.min(p.y, top - halfH + grabOffsetY);
+      }
+      drag.constraint.pointA = p;
     };
     const onUp = () => {
       if (!drag || !engine) return;
@@ -290,7 +343,7 @@ export default function ToyBox({
       const body = bodies[drag.index];
       const v = body.velocity;
       const speed = Math.hypot(v.x, v.y);
-      if (speed > 32) Body.setVelocity(body, { x: (v.x / speed) * 32, y: (v.y / speed) * 32 });
+      if (speed > 24) Body.setVelocity(body, { x: (v.x / speed) * 24, y: (v.y / speed) * 24 });
 
       const tapped = !drag.moved && performance.now() - drag.t0 < 300;
       const index = drag.index;
