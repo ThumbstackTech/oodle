@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { NextRequest } from "next/server";
-import { FREEBIE_FILES, FRIENDLY, clientIp, hasAccess, isFreebieSlug, json, logError, rateLimit } from "@/lib/freebies-server";
+import { FREEBIE_FILES, FRIENDLY, clientIp, hasAccess, notConfigured, isFreebieSlug, json, logError, rateLimit } from "@/lib/freebies-server";
 
 
 const DIR = path.join(process.cwd(), "private", "freebies");
@@ -10,6 +10,8 @@ async function handle(req: NextRequest, slug: string, head: boolean) {
   try {
     if (!rateLimit(`dl:${clientIp(req)}`, 30, 10 * 60_000)) return json({ ok: false, error: FRIENDLY.rate }, 429);
     if (!isFreebieSlug(slug)) return json({ ok: false, error: "Not found." }, 404);
+    const off = notConfigured("download", { secret: true });
+    if (off) return off;
     if (!hasAccess(req)) return json({ ok: false, needsRegistration: true }, 401);
 
     const { file, title } = FREEBIE_FILES[slug];

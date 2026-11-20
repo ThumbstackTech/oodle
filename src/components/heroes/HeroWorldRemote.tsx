@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, useState, type CSSProperties } from "react";
 import { sayings } from "@/content/site";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 import SpeechBubble from "../ui/SpeechBubble";
 import HeroHeading from "./HeroHeading";
 import { WORLDS } from "./worlds";
@@ -78,7 +78,7 @@ export default function HeroWorldRemote() {
             animate={{ clipPath: `circle(150% at ${l.origin.x} ${l.origin.y})` }}
             transition={{ duration: 0.7, ease: [0.77, 0, 0.175, 1] }}
           >
-            <Image src={lw.pattern} alt="" aria-hidden fill sizes="100vw" priority className="object-cover opacity-70" />
+            <PatternBg src={lw.pattern} className="opacity-70" />
             <div
               className="absolute inset-0"
               style={{

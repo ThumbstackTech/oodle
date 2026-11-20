@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion, useAnimate, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PortalIcon, Shape, World } from "@/content/site";
 import { Particle } from "../portal/particles";
 import { Button, Chip } from "../ui/Button";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 import SpeechBubble from "../ui/SpeechBubble";
 
 type Pair = { id: number; world: World; shape: Shape };
@@ -112,7 +112,7 @@ function GameCard({
               reduce ? `transition-opacity duration-200 ${faceUp || matched ? "opacity-0" : "opacity-100"}` : ""
             }`}
           >
-            <Image src={back.letters} alt="" aria-hidden fill sizes="160px" className="object-cover" />
+            <PatternBg src={back.letters} />
             <div className="absolute inset-[7%] flex flex-col items-center justify-between rounded-[10px] border-2 border-cream/35 py-[12%] text-cream">
               <span className="font-display text-[clamp(10px,1.2vw,15px)] leading-none text-cream/80">oodle</span>
               <span className="font-display text-[clamp(34px,5vw,64px)] leading-none text-sun">?</span>

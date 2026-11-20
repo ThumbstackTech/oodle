@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { freebies } from "@/content/site";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 import { MaskLines, Reveal } from "../ui/Reveal";
 
 type Item = (typeof freebies.items)[number];
@@ -68,14 +68,7 @@ function FreebieCard({ item, i, onPick }: { item: Item; i: number; onPick: (item
       } ${item.bg} ${LAYOUT[i]}`}
     >
       {/* brand pattern */}
-      <Image
-        src={item.pattern}
-        alt=""
-        aria-hidden
-        fill
-        sizes="(min-width: 1024px) 50vw, 100vw"
-        className="object-cover opacity-30 transition-transform duration-700 ease-(--ease-out) group-hover:scale-105"
-      />
+      <PatternBg src={item.pattern} className="opacity-30 transition-transform duration-700 ease-(--ease-out) group-hover:scale-105" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent" />
 
       <div className="relative flex items-start justify-between gap-3">
@@ -216,7 +209,7 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
       if (!Object.keys(fields).length) setFormError(data.error ?? FRIENDLY_ERROR);
       return;
     }
-    setFormError(res?.status === 429 && data.error ? data.error : FRIENDLY_ERROR);
+    setFormError((res?.status === 429 || res?.status === 503) && data.error ? data.error : FRIENDLY_ERROR);
   };
 
   return (
@@ -341,7 +334,14 @@ export default function FreebieFactory() {
     const res = await safeFetch(downloadUrl(item), { method: "HEAD" }, 6000);
     if (res?.ok) startDownload(item);
     else if (res?.status === 401) setPicked(item);
-    else setNotice(res?.status === 429 ? "Too many tries — please wait a minute." : "Couldn't start the download — please try again.");
+    else
+      setNotice(
+        res?.status === 429
+          ? "Too many tries — please wait a minute."
+          : res?.status === 503
+            ? "Downloads are taking a short break — please try again soon."
+            : "Couldn't start the download — please try again.",
+      );
   };
 
   return (

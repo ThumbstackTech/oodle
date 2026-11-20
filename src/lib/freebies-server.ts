@@ -29,6 +29,7 @@ const NO_STORE = { "Cache-Control": "no-store" };
 
 export const FRIENDLY = {
   generic: "Something went wrong — please try again.",
+  unavailable: "Downloads are taking a short break — please try again soon.",
   rate: "Too many tries — please wait a minute and try again.",
   forbidden: "This request isn't allowed.",
   bad: "Please check your details and try again.",
@@ -43,6 +44,23 @@ export function logError(tag: string, err: unknown) {
   const code =
     err && typeof err === "object" && "code" in err ? String((err as { code: unknown }).code) : err instanceof Error ? err.message.slice(0, 60) : "unknown";
   console.error(`[freebies:${tag}] ${code}`);
+}
+
+/* ---------------- Config ---------------- */
+
+/** Which required env vars are present. Booleans only — never the values. */
+export function configStatus() {
+  const s = process.env.FREEBIE_SECRET;
+  return { db: !!process.env.DATABASE_URL, secret: !!s && s.length >= 32 };
+}
+
+/** Returns a 503 response (and logs what's missing) if the server isn't configured; otherwise null. */
+export function notConfigured(tag: string, need: { db?: boolean; secret?: boolean }) {
+  const c = configStatus();
+  const missing = (need.db && !c.db) || (need.secret && !c.secret);
+  if (!missing) return null;
+  console.error(`[freebies:${tag}] MISSING_ENV db=${c.db} secret=${c.secret}`);
+  return json({ ok: false, error: FRIENDLY.unavailable }, 503);
 }
 
 /* ---------------- Request guards ---------------- */

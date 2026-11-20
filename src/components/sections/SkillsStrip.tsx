@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useRef, useState } from "react";
 import { gameDetails, skills } from "@/content/site";
 import GameModal from "../games/GameModal";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 import { MaskLines } from "../ui/Reveal";
 
 const SPRING = { type: "spring", stiffness: 130, damping: 20, mass: 0.9 } as const;
@@ -70,7 +70,7 @@ export default function SkillsStrip() {
                   animate={{ scale: isOpen ? 1.06 : 1, opacity: dim ? 0.4 : isOpen ? 0.52 : 0.45 }}
                   transition={{ duration: 0.7, ease: SMOOTH_EASE }}
                 >
-                  <Image src={p.pattern} alt="" aria-hidden fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+                  <PatternBg src={p.pattern} />
                 </motion.div>
                 <div
                   className="pointer-events-none absolute inset-0"

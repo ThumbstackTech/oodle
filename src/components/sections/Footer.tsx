@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { footer } from "@/content/site";
 import { Particle } from "../portal/particles";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 import SpeechBubble from "../ui/SpeechBubble";
 
 type Member = (typeof footer.parade)[number];
@@ -70,6 +71,7 @@ function SleepyCat({ coloured = true }: { coloured?: boolean }) {
           aria-hidden
           width={340}
           height={220}
+          loading="eager"
           draggable={false}
           className={`pointer-events-none block h-[clamp(36px,3.6vw,80px)] w-auto select-none overflow-visible p-1 transition-[filter] duration-300 ${coloured ? "sticker" : ""}`}
           style={coloured || awake ? undefined : { filter: UNCOLOURED }}
@@ -183,13 +185,13 @@ export default function Footer() {
       <div className="rounded-[40px] border-[3px] border-ink bg-slate p-[7px] shadow-[0_8px_0_0_var(--color-ink)] sm:p-[9px]">
         <div className="relative overflow-hidden rounded-[32px] border-2 border-cream/35 text-cream">
           {/* faint brand pattern */}
-          <Image src="/patterns/solve.svg" alt="" aria-hidden fill sizes="100vw" className="object-cover opacity-[0.12]" />
+          <PatternBg src="/patterns/solve.svg" className="opacity-[0.12]" />
 
           {/* Top: brand + links */}
           <div className="relative grid gap-10 px-6 pb-6 pt-10 sm:px-10 sm:pt-12 lg:grid-cols-12 lg:gap-8 lg:px-14 lg:pt-14">
             <div className="lg:col-span-6">
-              <Link href="/" scroll aria-label="Oodle Learn — home" className="relative block h-14 w-[126px] sm:h-16 sm:w-[144px]">
-                <Image src="/brand/logo-light.svg" alt="Oodle Learn" fill sizes="150px" className="object-contain object-left" />
+              <Link href="/" scroll aria-label="Oodle Learn — home" className="relative block w-fit">
+                <Image src="/brand/logo-light.svg" alt="Oodle Learn" width={144} height={64} loading="eager" className="h-14 w-auto sm:h-16" />
               </Link>
               <p className="mt-5 max-w-[16ch] font-display text-[clamp(1.8rem,3.4vw,3rem)] leading-[0.98]">
                 {footer.tagline.lead} <span className="text-sun">{footer.tagline.word}</span>

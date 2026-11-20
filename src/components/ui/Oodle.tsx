@@ -28,6 +28,8 @@ export default function Oodle({ world, shape, className = "", priority, alt = ""
       alt={alt}
       aria-hidden={alt ? undefined : true}
       priority={priority}
+      // Only ~18 small, cached SVGs — load eagerly (lazy + CSS-sized SVGs trip Chrome's lazy-image audit).
+      loading={priority ? undefined : "eager"}
       sizes={sizes}
       draggable={false}
       className={`pointer-events-none select-none ${className}`}

@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
 import { useEffect, useRef, useSyncExternalStore, type KeyboardEvent } from "react";
 import type { GameDetail, Shape } from "@/content/site";
 import { Particle } from "../portal/particles";
 import { Button } from "../ui/Button";
 import Oodle from "../ui/Oodle";
+import PatternBg from "../ui/PatternBg";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
@@ -131,7 +131,7 @@ export default function GameModal({
         <div data-lenis-prevent className="oodle-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {/* Header */}
           <header className={`relative overflow-hidden border-b-[3px] border-ink ${theme.bg} px-6 pt-8 text-cream sm:px-10 sm:pt-10`}>
-            <Image src={theme.pattern} alt="" aria-hidden fill sizes="1080px" className="object-cover opacity-45" />
+            <PatternBg src={theme.pattern} className="opacity-45" />
             <div
               aria-hidden
               className="absolute inset-0"

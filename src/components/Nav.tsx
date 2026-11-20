@@ -16,19 +16,19 @@ function Wordmark({ light = false, href = "/", onClick }: { light?: boolean; hre
       <Image
         src="/brand/logo.svg"
         alt="Oodle Learn"
-        fill
+        width={99}
+        height={44}
         priority
-        sizes="100px"
-        className={`object-contain object-left transition-[opacity,transform] duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-3 ${light ? "opacity-0" : "opacity-100"}`}
+        className={`absolute inset-0 h-full w-full object-contain object-left transition-[opacity,transform] duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-3 ${light ? "opacity-0" : "opacity-100"}`}
       />
       <Image
         src="/brand/logo-light.svg"
         alt=""
         aria-hidden
-        fill
+        width={99}
+        height={44}
         priority
-        sizes="100px"
-        className={`object-contain object-left transition-[opacity,transform] duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-3 ${light ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 h-full w-full object-contain object-left transition-[opacity,transform] duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-3 ${light ? "opacity-100" : "opacity-0"}`}
       />
     </Link>
   );

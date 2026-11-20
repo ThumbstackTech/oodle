@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { ensureSchema, sql } from "@/lib/db";
-import { FRIENDLY, clientIp, hashIp, json, logError, rateLimit, readJson, sameOrigin, setAccessCookie, validate } from "@/lib/freebies-server";
+import { FRIENDLY, clientIp, notConfigured, hashIp, json, logError, rateLimit, readJson, sameOrigin, setAccessCookie, validate } from "@/lib/freebies-server";
 
 
 const MIN_FILL_MS = 2000;
@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
 
     const { data, errors } = validate(body);
     if (!data) return json({ ok: false, error: FRIENDLY.bad, errors }, 400);
+
+    const off = notConfigured("register", { db: true, secret: true });
+    if (off) return off;
 
     await ensureSchema();
     const db = sql();
