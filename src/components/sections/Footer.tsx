@@ -2,13 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
+import { motion } from "motion/react";
+import { useState } from "react";
 import { footer } from "@/content/site";
 import { Particle } from "../portal/particles";
 import Oodle from "../ui/Oodle";
 import PatternBg from "../ui/PatternBg";
-import SpeechBubble from "../ui/SpeechBubble";
 
 type Member = (typeof footer.parade)[number];
 const CAST = footer.parade;
@@ -26,58 +25,6 @@ function Figure({ m, className = "", imgClass = "", style }: { m: Member; classN
     <span className={`block h-[clamp(76px,8.8vw,196px)] shrink-0 overflow-visible p-1 ${className}`} style={style}>
       <Oodle world={m.world} shape={m.shape} className={`h-full w-auto overflow-visible p-1 ${imgClass}`} sizes="140px" />
     </span>
-  );
-}
-
-/** A loaf cat napping at the end of a strip. Hover (or tap) and it says meow. */
-function SleepyCat({ coloured = true }: { coloured?: boolean }) {
-  const [awake, setAwake] = useState(false);
-  const timer = useRef(0);
-  const meow = () => {
-    setAwake(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setAwake(false), 1600);
-  };
-  return (
-    <button
-      type="button"
-      aria-label="A sleepy cat. Meow!"
-      onPointerEnter={(e) => e.pointerType === "mouse" && meow()}
-      onClick={meow}
-      className="relative block shrink-0 cursor-pointer self-end overflow-visible"
-    >
-      <AnimatePresence>
-        {awake && (
-          <motion.span
-            initial={{ opacity: 0, y: 8, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.12 } }}
-            transition={{ type: "spring", duration: 0.4, bounce: 0.5 }}
-            style={{ originX: 0.5, originY: 1 }}
-            className="absolute bottom-[78%] left-[30%] z-10 -translate-x-1/2"
-          >
-            <SpeechBubble className="font-display !text-[16px] sm:!text-[18px]">meow!</SpeechBubble>
-          </motion.span>
-        )}
-      </AnimatePresence>
-      <motion.span
-        className="block origin-bottom"
-        animate={awake ? { scaleY: [1, 1.08, 1], y: [0, -6, 0] } : { scaleY: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
-      >
-        <Image
-          src="/oodles/extra/cat.svg"
-          alt=""
-          aria-hidden
-          width={340}
-          height={220}
-          loading="eager"
-          draggable={false}
-          className={`pointer-events-none block h-[clamp(36px,3.6vw,80px)] w-auto select-none overflow-visible p-1 transition-[filter] duration-300 ${coloured ? "sticker" : ""}`}
-          style={coloured || awake ? undefined : { filter: UNCOLOURED }}
-        />
-      </motion.span>
-    </button>
   );
 }
 
@@ -107,7 +54,6 @@ function ColourRow() {
           <Figure m={m} imgClass="sticker" />
         </motion.span>
       ))}
-      <SleepyCat />
     </div>
   );
 }
@@ -149,7 +95,6 @@ function ColourMeInRow() {
           </button>
         );
       })}
-      <SleepyCat coloured={false} />
     </div>
   );
 }
