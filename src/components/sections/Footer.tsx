@@ -99,12 +99,27 @@ function ColourMeInRow() {
   );
 }
 
+/**
+ * Oodle-style Instagram mark: a chunky tomato camera whose lens is a smiling Oodle face,
+ * with a little sun sparkle for the flash. Brand palette only.
+ */
 function InstagramIcon({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
-      <rect x="3" y="3" width="18" height="18" rx="5.5" stroke="currentColor" strokeWidth="2.2" />
-      <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="2.2" />
-      <circle cx="17.4" cy="6.6" r="1.3" fill="currentColor" />
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden className={className}>
+      {/* soft drop */}
+      <rect x="2.5" y="3.5" width="27" height="27" rx="9" fill="#1e222d" opacity="0.14" />
+      {/* camera body */}
+      <rect x="2" y="2" width="27" height="27" rx="9" fill="#ea3d39" />
+      <rect x="5.2" y="5.2" width="20.6" height="20.6" rx="6.4" stroke="#e4e1cf" strokeWidth="2" />
+      {/* lens = Oodle face */}
+      <circle cx="15.5" cy="16" r="6.2" fill="#f2d439" />
+      <circle cx="13.4" cy="15.1" r="1.05" fill="#1e222d" />
+      <circle cx="17.6" cy="15.1" r="1.05" fill="#1e222d" />
+      <path d="M13.2 17.6q2.3 2.1 4.6 0" stroke="#1e222d" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="11.9" cy="17.4" r="0.9" fill="#ea3d39" opacity="0.45" />
+      <circle cx="19.1" cy="17.4" r="0.9" fill="#ea3d39" opacity="0.45" />
+      {/* flash sparkle */}
+      <path d="M22.4 7.2l.7 1.7 1.7.7-1.7.7-.7 1.7-.7-1.7-1.7-.7 1.7-.7z" fill="#f2d439" />
     </svg>
   );
 }
@@ -134,11 +149,9 @@ export default function Footer() {
                 href={footer.instagram.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-7 inline-flex items-center gap-2.5 rounded-full border-[2.5px] border-ink bg-cream py-2 pl-2 pr-5 text-[15px] font-bold text-ink shadow-[0_4px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:shadow-none [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5"
+                className="group mt-7 inline-flex items-center gap-2.5 btn-soft rounded-full bg-cream py-2 pl-2 pr-5 text-[15px] font-bold text-ink transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:[--btn-depth:0px] [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5"
               >
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-tomato text-cream">
-                  <InstagramIcon className="h-[18px] w-[18px]" />
-                </span>
+                <InstagramIcon className="h-8 w-8 transition-transform duration-300 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:group-hover:-rotate-[8deg] [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-110" />
                 {footer.instagram.handle}
               </a>
             </div>
@@ -170,25 +183,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Studio credit — under the character strip */}
-          <div className="relative flex justify-start px-6 pb-6 pt-9 sm:px-10 sm:pt-10 lg:px-14">
-            <a
-              href="https://thumbstack.co/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-[0.38em] text-[clamp(18px,1.6vw,23px)] font-medium leading-none text-[#ffffff] transition-opacity duration-200 hover:opacity-80"
-            >
-              A
-              <Image src="/brand/thumbstack.svg" alt="Thumbstack" width={84} height={11} loading="eager" className="h-[0.74em] w-auto" />
-              Website
-            </a>
-          </div>
-
           {/* Bottom bar */}
-          <div className="relative flex flex-col gap-3 border-t-2 border-cream/20 px-6 py-5 text-[13px] text-cream/75 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-14">
-            <p>
-              © 2026 Oodle Learn <span className="mx-2 opacity-50">·</span> {footer.note}
-            </p>
+          <div className="relative flex flex-col gap-3 px-6 pb-5 pt-9 sm:pt-10 text-[13px] text-cream/75 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-14">
+            <p>© 2026 Oodle Learn</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {footer.legal.map((l) => (
                 <li key={l.label}>

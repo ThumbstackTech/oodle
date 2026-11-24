@@ -139,7 +139,7 @@ export default function HeroPickACard() {
                 <button
                   type="button"
                   onClick={() => setFlipped([false, false, false])}
-                  className="rounded-full border-2 border-ink bg-sun px-4 py-2 text-[13px] font-bold text-ink transition-transform duration-[120ms] active:scale-[0.97]"
+                  className="btn-soft rounded-full bg-sun px-4 py-2 text-[13px] font-bold text-ink [--btn-depth:3px] transition-transform duration-[120ms] active:scale-[0.97]"
                 >
                   Shuffle again
                 </button>

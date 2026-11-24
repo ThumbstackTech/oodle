@@ -6,6 +6,7 @@ import { story } from "@/content/site";
 import { Button } from "../ui/Button";
 import StoryModal from "./StoryModal";
 import Oodle from "../ui/Oodle";
+import PlaytestScene from "../ui/PlaytestScene";
 import { MaskLines, Reveal } from "../ui/Reveal";
 
 /** One abstract doodle stroke: top-left → bottom-right with a single twirl in the middle (viewBox 1440×1000). */
@@ -55,8 +56,9 @@ function Bubble({ text, slot, delay }: { text: string; slot: (typeof SLOTS)[numb
 
 /**
  * Section 6 — Behind the Games.
- * A kitchen-table scene: a taped polaroid of a mom & a little boy (Oodle stand-ins until the founders'
- * photo arrives) with his questions popping up around it. Tap "Ask another" and he keeps asking.
+ * A taped polaroid of "Playtest #1": the first paper prototype on the kitchen table (swap for a real
+ * photo if the founders share one), with a curious Oodle's questions popping up around it.
+ * Tap "Ask another" and it keeps asking.
  */
 export default function OodleStory() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -151,21 +153,13 @@ export default function OodleStory() {
           >
             {/* tape */}
             <span aria-hidden className="absolute -top-4 left-1/2 z-10 h-8 w-28 -translate-x-1/2 rotate-[-4deg] rounded-sm border-2 border-ink/20 bg-sun/85" />
-            {/* polaroid */}
-            <div className="rounded-[10px] border-[3px] border-ink bg-cream p-[5%] pb-[16%] shadow-[0_10px_0_0_rgb(30_34_45/0.55)]">
-              <div className="relative aspect-[4/4.2] overflow-hidden rounded-[6px] border-[2.5px] border-ink bg-lilac">
-                {/* home: a window and a sunny wall */}
-                <div aria-hidden className="absolute left-[10%] top-[10%] grid h-[30%] w-[34%] grid-cols-2 gap-[4%] rounded-[6px] border-[2.5px] border-ink bg-sun p-[4%]">
-                  <span className="rounded-[3px] bg-cream/70" />
-                  <span className="rounded-[3px] bg-cream/70" />
-                  <span className="rounded-[3px] bg-cream/70" />
-                  <span className="rounded-[3px] bg-cream/70" />
-                </div>
-                <div aria-hidden className="absolute inset-x-0 bottom-0 h-[24%] border-t-[2.5px] border-ink bg-ochre" />
-                {/* mom (working-mom clover with briefcase) + little boy (curious coin) */}
-                <Oodle world="biz" shape="clover" className="absolute bottom-[10%] left-[14%] h-auto w-[46%] drop-shadow-[0_6px_0_rgb(30_34_45/0.25)]" sizes="200px" />
-                <motion.div ref={boyScope} className="absolute bottom-[10%] right-[12%] w-[30%] origin-bottom">
-                  <Oodle world="money" shape="coin" className="h-auto w-full drop-shadow-[0_6px_0_rgb(30_34_45/0.25)]" sizes="140px" />
+            {/* polaroid: the first paper prototype on the kitchen table */}
+            <div className="card-soft rounded-[10px] bg-cream p-[5%] pb-[16%] shadow-[0_2px_6px_-2px_rgb(0_0_0/0.2),0_28px_50px_-22px_rgb(0_0_0/0.55)]">
+              <div className="relative aspect-[4/4.2] overflow-hidden rounded-[6px]">
+                <PlaytestScene className="absolute inset-0 h-full w-full" />
+                {/* a curious little Oodle peeking over the table edge — hops when "Ask another" is tapped */}
+                <motion.div ref={boyScope} className="absolute -bottom-[7%] left-[34%] w-[22%] origin-bottom">
+                  <Oodle world="solve" shape="star" className="h-auto w-full drop-shadow-[0_4px_6px_rgb(30_34_45/0.3)]" sizes="110px" />
                 </motion.div>
               </div>
               <p className="mt-[5%] text-center font-display text-[clamp(15px,1.5vw,21px)] text-ink">{story.caption}</p>
@@ -181,7 +175,7 @@ export default function OodleStory() {
             <button
               type="button"
               onClick={ask}
-              className="inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-cream px-5 py-2.5 text-[14px] font-bold text-ink shadow-[0_4px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:shadow-none"
+              className="inline-flex items-center gap-2 btn-soft rounded-full bg-cream px-5 py-2.5 text-[14px] font-bold text-ink transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:[--btn-depth:0px]"
             >
               <span className="font-display text-[18px] leading-none text-tomato">?</span>
               {story.ask}

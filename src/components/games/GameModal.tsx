@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Image from "next/image";
 import { useEffect, useRef, useSyncExternalStore, type KeyboardEvent } from "react";
 import type { GameDetail, Shape } from "@/content/site";
 import { Particle } from "../portal/particles";
@@ -109,7 +110,7 @@ export default function GameModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-[94svh] w-full flex-col overflow-hidden rounded-t-[28px] border-[3px] border-b-0 border-ink bg-cream shadow-[0_-6px_0_0_rgb(30_34_45/0.25)] sm:max-h-[90svh] sm:max-w-[1080px] sm:rounded-[32px] sm:border-b-[3px] sm:shadow-[0_12px_0_0_var(--color-ink)]"
+        className="relative flex max-h-[94svh] w-full flex-col overflow-hidden rounded-t-[28px] bg-cream shadow-[0_-12px_40px_-12px_rgb(30_34_45/0.35)] sm:max-h-[90svh] sm:max-w-[1080px] sm:rounded-[32px] sm:shadow-[0_40px_90px_-30px_rgb(0_0_0/0.55),0_0_0_1px_rgb(30_34_45/0.06)]"
         initial={mobile ? { y: "100%" } : { opacity: 0, scale: 0.96, y: 24 }}
         animate={mobile ? { y: 0, transition: { type: "spring", duration: 0.5, bounce: 0.12 } } : { opacity: 1, scale: 1, y: 0, transition: { type: "spring", duration: 0.5, bounce: 0.2 } }}
         exit={mobile ? { y: "100%", transition: { duration: 0.22, ease: EASE } } : { opacity: 0, scale: 0.97, y: 12, transition: { duration: 0.18, ease: EASE } }}
@@ -120,7 +121,7 @@ export default function GameModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-cream text-ink shadow-[0_4px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:shadow-none sm:right-5 sm:top-5"
+          className="absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center btn-soft rounded-full bg-cream text-ink transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:[--btn-depth:0px] sm:right-5 sm:top-5"
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
             <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
@@ -130,7 +131,7 @@ export default function GameModal({
         {/* Scrollable body */}
         <div data-lenis-prevent className="oodle-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {/* Header */}
-          <header className={`relative overflow-hidden border-b-[3px] border-ink ${theme.bg} px-6 pt-8 text-cream sm:px-10 sm:pt-10`}>
+          <header className={`relative overflow-hidden ${theme.bg} px-6 pt-8 text-cream sm:px-10 sm:pt-10`}>
             <PatternBg src={theme.pattern} className="opacity-45" />
             <div
               aria-hidden
@@ -138,16 +139,19 @@ export default function GameModal({
               style={{ background: `radial-gradient(ellipse 80% 75% at 18% 22%, ${theme.hex} 40%, transparent 85%), linear-gradient(to top, ${theme.hex} 8%, transparent 45%)` }}
             />
             <div className="relative pr-12">
-              <span className={`inline-block rounded-full border-2 border-ink px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${theme.chip}`}>
-                The Oodle Play Lab
-              </span>
               <h2
                 id={titleId}
-                className="mt-3 font-display text-[clamp(2.6rem,6vw,4.75rem)] leading-[0.92] text-sun [-webkit-text-stroke:0.06em_var(--color-ink)] [paint-order:stroke_fill] [text-shadow:0_4px_0_var(--color-ink)]"
+                aria-label={`${game.name} by Oodle Learn`}
+                className="font-display text-[clamp(2.6rem,6vw,4.75rem)] leading-[0.92] text-sun [-webkit-text-stroke:0.06em_var(--color-ink)] [paint-order:stroke_fill] [text-shadow:0_4px_10px_rgb(30_34_45/0.35)]"
               >
                 {game.name}
               </h2>
-              <p className="mt-2 text-[clamp(1rem,1.6vw,1.25rem)] font-semibold text-cream drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]">{game.tagline}</p>
+              {/* "by Oodle Learn" lockup — the brand logo sits right under the game name */}
+              <div aria-hidden className="mt-3 flex items-center gap-2.5">
+                <span className="text-[clamp(0.95rem,1.3vw,1.1rem)] font-semibold italic text-cream/85">by</span>
+                <Image src="/brand/logo-light.svg" alt="" width={99} height={44} className="h-[clamp(34px,4vw,44px)] w-auto drop-shadow-[0_2px_4px_rgb(0_0_0/0.25)]" />
+              </div>
+              <p className="mt-3 text-[clamp(1rem,1.6vw,1.25rem)] font-semibold text-cream drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]">{game.tagline}</p>
             </div>
             {/* the cast */}
             <div className="relative mt-6 flex items-end justify-center gap-[1.5%] sm:mt-8">
@@ -184,7 +188,7 @@ export default function GameModal({
               <SectionTitle>Quick game facts</SectionTitle>
               <dl className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 {game.facts.map((f) => (
-                  <div key={f.label} className="flex flex-col rounded-[20px] border-[2.5px] border-ink bg-cream p-4 shadow-[0_4px_0_0_var(--color-ink)]">
+                  <div key={f.label} className="card-soft flex flex-col rounded-[20px] bg-[color-mix(in_srgb,white_35%,var(--color-cream))] p-4">
                     <Particle icon={f.icon} className="h-9 w-9" />
                     <dt className="mt-3 text-[12px] font-bold uppercase tracking-[0.12em] text-ink/55">{f.label}</dt>
                     <dd className="mt-1 text-[15px] font-semibold leading-snug text-ink">{f.value}</dd>
@@ -200,14 +204,14 @@ export default function GameModal({
                 {game.feature.items.map((it, i) => (
                   <li
                     key={it.name}
-                    className={`relative flex flex-col rounded-[22px] border-[2.5px] border-ink p-5 shadow-[0_5px_0_0_var(--color-ink)] ${tiles[i % tiles.length]}`}
+                    className={`card-soft relative flex flex-col rounded-[22px] p-5 ${tiles[i % tiles.length]}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-display text-[clamp(1.5rem,2.2vw,1.9rem)] leading-none">
                         {game.world === "biz" ? `${i + 1}. ` : ""}
                         {it.name}
                       </span>
-                      <span className="grid h-11 w-11 place-items-center rounded-full border-2 border-ink bg-cream">
+                      <span className="grid h-11 w-11 place-items-center rounded-full bg-cream shadow-[0_2px_6px_-1px_rgb(30_34_45/0.2)]">
                         <Particle icon={it.icon} className="h-7 w-7" />
                       </span>
                     </div>
@@ -219,7 +223,7 @@ export default function GameModal({
             </section>
 
             {/* How to play */}
-            <section className="grid gap-6 rounded-[26px] border-[2.5px] border-ink bg-[color-mix(in_srgb,var(--color-sun)_28%,var(--color-cream))] p-6 sm:p-8 lg:grid-cols-12 lg:gap-10">
+            <section className="grid gap-6 rounded-[26px] bg-[color-mix(in_srgb,var(--color-sun)_28%,var(--color-cream))] p-6 sm:p-8 lg:grid-cols-12 lg:gap-10">
               <div className="lg:col-span-5">
                 <span className="text-[13px] font-medium text-ink/60">How to play</span>
                 <p className="mt-2 font-display text-[clamp(1.5rem,2.8vw,2.3rem)] leading-[1.05] text-ink">{game.howTo.headline}</p>
@@ -228,7 +232,7 @@ export default function GameModal({
                 <ol className="space-y-3">
                   {game.howTo.body.map((p, i) => (
                     <li key={p} className="flex gap-3 text-[clamp(0.98rem,1.2vw,1.06rem)] leading-[1.65] text-ink/85">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 border-ink bg-cream text-[12px] font-bold">{i + 1}</span>
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-cream text-[12px] font-bold shadow-[0_1px_4px_-1px_rgb(30_34_45/0.25)]">{i + 1}</span>
                       <span>{p}</span>
                     </li>
                   ))}
@@ -238,7 +242,7 @@ export default function GameModal({
                     {game.howTo.wins.map((w, i) => (
                       <span
                         key={w}
-                        className="inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-sun px-4 py-1.5 text-[14px] font-bold text-ink shadow-[0_3px_0_0_var(--color-ink)]"
+                        className="card-soft inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-[14px] font-bold text-ink"
                         style={{ rotate: `${i ? 1.5 : -1.5}deg` }}
                       >
                         <Particle icon="trophy" className="h-5 w-5" />
@@ -276,7 +280,7 @@ export default function GameModal({
                   {game.practise.map((x, i) => (
                     <li
                       key={x}
-                      className={`rounded-full border-[2.5px] border-ink px-4 py-2 text-[14px] font-semibold ${i % 3 === 0 ? "bg-sun text-ink" : i % 3 === 1 ? "bg-cream text-ink" : `${theme.bg} text-cream`}`}
+                      className={`card-soft rounded-full px-4 py-2 text-[14px] font-semibold ${i % 3 === 0 ? "bg-sun text-ink" : i % 3 === 1 ? "bg-cream text-ink" : `${theme.bg} text-cream`}`}
                     >
                       {x}
                     </li>
@@ -286,7 +290,7 @@ export default function GameModal({
             </div>
 
             {/* For the grown-ups */}
-            <section className="relative rounded-[26px] border-[2.5px] border-ink bg-cream p-6 pt-8 shadow-[0_5px_0_0_var(--color-ink)] sm:p-8 sm:pt-10">
+            <section className="card-soft relative rounded-[26px] bg-[color-mix(in_srgb,white_35%,var(--color-cream))] p-6 pt-8 sm:p-8 sm:pt-10">
               <span aria-hidden className={`absolute -top-6 left-6 font-display text-[64px] leading-none ${ACCENT[game.world]}`}>“</span>
               <SectionTitle>For the grown-ups</SectionTitle>
               <div className="mt-3 space-y-3 text-[clamp(0.98rem,1.2vw,1.08rem)] leading-[1.7] text-ink/80">
@@ -299,7 +303,7 @@ export default function GameModal({
         </div>
 
         {/* Sticky buy bar */}
-        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t-[3px] border-ink bg-cream px-6 py-4 sm:px-10">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-ink/[0.08] bg-cream px-6 py-4 shadow-[0_-10px_24px_-16px_rgb(30_34_45/0.3)] sm:px-10">
           <div className="flex items-center gap-3">
             <Button href={game.buyHref || "#"} disabled={!hasLink}>
               {game.buyLabel}

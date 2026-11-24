@@ -100,7 +100,7 @@ function FreebieCard({ item, i, onPick }: { item: Item; i: number; onPick: (item
       <div className={`relative mt-auto ${tall ? "max-lg:max-w-[64%]" : wide ? "max-w-[64%] lg:max-w-[60%]" : "max-w-[64%]"}`}>
         <h3 className="font-display text-[clamp(1.5rem,2.2vw,2.2rem)] leading-[0.95] text-sun [text-shadow:0_2px_0_rgb(30_34_45/0.55)] [text-wrap:balance]">{item.title}</h3>
         <p className="mt-2 max-w-[34ch] text-[15px] font-medium leading-snug text-cream [text-shadow:0_1px_2px_rgb(0_0_0/0.45)]">{item.blurb}</p>
-        <span className="mt-5 inline-flex items-center gap-2 rounded-full border-[2.5px] border-ink bg-cream py-1.5 pl-4 pr-1.5 text-[14px] font-bold text-ink">
+        <span className="mt-5 inline-flex items-center gap-2 btn-soft rounded-full bg-cream py-1.5 pl-4 pr-1.5 text-[14px] font-bold text-ink [--btn-depth:3px]">
           Free download
           <span className="grid h-7 w-7 place-items-center rounded-full bg-ink text-cream transition-transform duration-300 group-hover:translate-y-0.5">
             <DownloadIcon className="h-3.5 w-3.5" />
@@ -232,7 +232,7 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-cream transition-transform duration-[120ms] active:scale-95"
+          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center btn-soft rounded-full bg-cream [--btn-depth:2px] transition-transform duration-[120ms] active:scale-95"
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
             <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
@@ -267,7 +267,7 @@ function RegisterModal({ item, onClose }: { item: Item; onClose: () => void }) {
                 type="submit"
                 disabled={sending}
                 aria-busy={sending}
-                className="mt-6 flex h-[52px] w-full items-center justify-center gap-2.5 rounded-full border-[2.5px] border-ink bg-sun text-[15px] font-bold shadow-[0_5px_0_0_var(--color-ink)] transition-[transform,box-shadow,opacity] duration-[120ms] active:translate-y-[5px] active:shadow-none disabled:cursor-wait disabled:opacity-70"
+                className="mt-6 flex h-[52px] w-full items-center justify-center gap-2.5 btn-soft rounded-full bg-sun text-[15px] font-bold [--btn-depth:5px] transition-[transform,box-shadow,opacity] duration-[120ms] active:translate-y-[5px] active:[--btn-depth:0px] disabled:cursor-wait disabled:opacity-70"
               >
                 {sending ? "Sending…" : f.submit}
                 {!sending && <DownloadIcon className="h-4 w-4" />}

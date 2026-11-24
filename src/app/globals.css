@@ -78,6 +78,38 @@
   }
 }
 
+/*
+  Soft button edge (client feedback: solid ink outlines + hard ink drop read as harsh/cheap).
+  A faint tinted edge, a translucent "press" ledge and a soft haze keep the chunky,
+  pressable feel without the black outline. Tune the whole site's buttons here.
+  Depth is driven by --btn-depth so hover/active states just change the variable:
+    hover:[--btn-depth:7px]  active:[--btn-depth:0px]
+*/
+:root {
+  --btn-edge: rgb(30 34 45 / 0.14);
+  --btn-drop: rgb(30 34 45 / 0.26);
+  --btn-haze: rgb(30 34 45 / 0.28);
+}
+
+/* Soft card/tile edge: hairline tint + feathered shadow instead of an ink outline. */
+@utility card-soft {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(30 34 45 / 0.08);
+  box-shadow:
+    0 2px 4px -2px rgb(30 34 45 / 0.08),
+    0 12px 28px -16px rgb(30 34 45 / 0.32);
+}
+
+@utility btn-soft {
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: var(--btn-edge);
+  box-shadow:
+    0 var(--btn-depth, 4px) 0 0 var(--btn-drop),
+    0 calc(var(--btn-depth, 4px) + 6px) 18px -8px var(--btn-haze);
+}
+
 @layer utilities {
   .font-display {
     font-family: var(--font-display);

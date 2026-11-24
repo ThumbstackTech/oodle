@@ -13,7 +13,8 @@ export const nav = {
     { label: "Freebie Factory", href: "#freebies" },
     { label: "FAQs", href: "#faq" },
   ],
-  cta: { label: "Buy on Amazon", href: "#games" },
+  cta: { label: "Buy Now", href: "#games" },
+  freebie: { label: "Download Freebie Printables", href: "#freebies" },
 };
 
 export const hero = {
@@ -372,7 +373,7 @@ export const story = {
   ],
   cta: { label: "Get to Know Us", href: "#story" },
   /** Placeholder until the founders' photo arrives. */
-  caption: "Olinda & Orai · where it all began",
+  caption: "Playtest #1 · the kitchen table",
   ask: "Ask another",
   /** The little boy's questions. [draft] */
   questions: [
@@ -713,7 +714,7 @@ export const finalCta = {
   sub: "Find your first Oodle game and let the discoveries begin.",
   cta: { label: "Explore Our Games", href: "#games" },
   /** Amazon link — add later */
-  buy: { label: "Buy on Amazon", href: "#games" },
+  buy: { label: "Buy Now", href: "#games" },
 };
 
 /** Footer — content from the copy doc's "Website footer". */
@@ -732,7 +733,6 @@ export const footer = {
     { label: "Shipping & Delivery", href: "/shipping" },
     { label: "Refund Policy", href: "/refunds" },
   ],
-  note: "Physical games delivered within India",
   hint: { hover: "psst… hover to colour us in", tap: "psst… tap to colour us in" }, // [draft]
   /** The parade, left → right. `prop` = a little brand item between characters. */
   parade: [
