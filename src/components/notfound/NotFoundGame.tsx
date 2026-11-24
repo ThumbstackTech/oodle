@@ -297,7 +297,7 @@ export default function NotFoundGame() {
           <button
             type="button"
             onClick={restart}
-            className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-sun px-3.5 py-1.5 text-[13px] font-bold leading-none shadow-[0_3px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[3px] active:shadow-none"
+            className="inline-flex items-center gap-2 btn-soft rounded-full bg-sun px-3.5 py-1.5 text-[13px] font-bold leading-none [--btn-depth:3px] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[3px] active:[--btn-depth:0px]"
           >
             <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" aria-hidden>
               <path d="M4 10a6 6 0 0 1 10.5-4M16 10a6 6 0 0 1-10.5 4M14 2v4h-4M6 18v-4h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -366,7 +366,7 @@ export default function NotFoundGame() {
                     <button
                       type="button"
                       onClick={restart}
-                      className="rounded-full border-[2.5px] border-ink bg-cream px-5 py-3 text-[14px] font-bold shadow-[0_4px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:shadow-none"
+                      className="btn-soft rounded-full bg-cream px-5 py-3 text-[14px] font-bold transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:[--btn-depth:0px]"
                     >
                       Play again
                     </button>

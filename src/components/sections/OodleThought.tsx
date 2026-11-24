@@ -210,6 +210,23 @@ export default function OodleThought() {
     { s: useTransform(scrollYProgress, [0.8, 0.84], [0.85, 1.25]), o: useTransform(scrollYProgress, [0.8, 0.84], [0.3, 1]) },
   ];
 
+  /** Scroll progress at which each beat is fully revealed (see the ranges above). */
+  const DOT_TARGETS = [0.39, 0.76, 0.95];
+  const DOT_LABELS = ["Part 1", "Part 2", "Closing thought"];
+
+  /** Jump to a beat: map its scroll progress back to a page Y using the same offsets as useScroll. */
+  const goToBeat = (i: number) => {
+    const pin = pinRef.current;
+    if (!pin) return;
+    const vh = window.innerHeight;
+    const top = pin.getBoundingClientRect().top + window.scrollY;
+    const start = top - vh * 0.55; // "start 55%"
+    const end = top + pin.offsetHeight - vh; // "end end"
+    const y = start + DOT_TARGETS[i] * (end - start);
+    if (window.__lenis) window.__lenis.scrollTo(y, { duration: 1.1 });
+    else window.scrollTo({ top: y, behavior: "smooth" });
+  };
+
   if (reduce) {
     return (
       <section aria-labelledby="thought-title" className="relative bg-cream pt-28 text-ink">
@@ -250,9 +267,20 @@ export default function OodleThought() {
                 <Closing style={{ opacity: closeOpacity, y: closeY, scale: closeScale }} />
               </div>
 
-              <div aria-hidden className="mt-[clamp(18px,3.5svh,44px)] flex items-center gap-2.5">
+              <div className="mt-[clamp(10px,2.5svh,36px)] flex items-center">
                 {dots.map((d, i) => (
-                  <motion.span key={i} style={{ scale: d.s, opacity: d.o }} className="h-2 w-2 rounded-full bg-ink" />
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => goToBeat(i)}
+                    aria-label={`Go to ${DOT_LABELS[i]}`}
+                    className="group grid h-8 w-5 cursor-pointer place-items-center rounded-full"
+                  >
+                    <motion.span
+                      style={{ scale: d.s, opacity: d.o }}
+                      className="h-2 w-2 rounded-full bg-ink transition-[filter] duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:brightness-150"
+                    />
+                  </button>
                 ))}
               </div>
             </div>

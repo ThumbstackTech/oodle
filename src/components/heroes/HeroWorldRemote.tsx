@@ -19,7 +19,8 @@ type Layer = { i: number; key: number; origin: { x: string; y: string } };
  * The whole hero *is* a world. It advances every 3s (the progress bar in the active tab *is* the
  * timer), and the chunky tabs let you jump to any world. The new world wipes in from the tab that
  * triggered it (clip-path circle) and its whole cast pops up along the bottom.
- * Pauses while the pointer is on the remote, when the hero is off-screen, or via the pause button.
+ * Loops continuously. Hovering a tab (mouse) jumps straight to that world and holds it while the
+ * pointer is on the remote; clicking/tapping a tab does the same on touch. Also pauses off-screen.
  */
 export default function HeroWorldRemote() {
   const reduce = useReducedMotion();
@@ -33,11 +34,10 @@ export default function HeroWorldRemote() {
   const [hovering, setHovering] = useState(false);
   // which cast member is being hovered / tapped (null = none)
   const [poked, setPoked] = useState<number | null>(null);
-  const [stopped, setStopped] = useState(false);
   // Bumped on every world change so the timer bar restarts from zero.
   const [tick, setTick] = useState(0);
 
-  const paused = hovering || poked !== null || stopped || !inView || !!reduce;
+  const paused = hovering || poked !== null || !inView || !!reduce;
 
   const go = (i: number) => {
     setPoked(null);
@@ -103,7 +103,7 @@ export default function HeroWorldRemote() {
         onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)}
         onPointerLeave={() => setHovering(false)}
       >
-        <div className="flex items-center gap-1 rounded-full border-[2.5px] border-ink bg-cream p-1 shadow-[0_5px_0_0_var(--color-ink)] sm:gap-2 sm:p-1.5">
+        <div className="flex items-center gap-1 btn-soft rounded-full bg-cream p-1 [--btn-depth:5px] sm:gap-2 sm:p-1.5">
         <div role="tablist" aria-label="Choose a world" className="flex gap-0.5 sm:gap-2">
           {WORLDS.map((tw, i) => {
             const on = i === active;
@@ -117,11 +117,12 @@ export default function HeroWorldRemote() {
                 aria-selected={on}
                 aria-label={tw.game}
                 onClick={() => go(i)}
+                onPointerEnter={(e) => e.pointerType === "mouse" && i !== active && go(i)}
                 className={`relative flex h-11 items-center gap-1.5 overflow-hidden rounded-full pl-1 pr-2.5 text-[12.5px] min-[400px]:pr-3 min-[400px]:text-[13px] font-bold transition-[background-color,color,transform] duration-200 active:scale-[0.97] sm:h-12 sm:gap-2 sm:pl-1.5 sm:pr-5 sm:text-[15px] ${
                   on ? "bg-sun text-ink" : "text-ink/70 hover:bg-ink/[0.06]"
                 }`}
               >
-                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 border-ink sm:h-9 sm:w-9 ${tw.bg}`}>
+                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-[1.5px] border-ink/20 sm:h-9 sm:w-9 ${tw.bg}`}>
                   <Oodle world={tw.id} shape={tw.cast[0]} className="h-5 w-auto sm:h-6" sizes="36px" />
                 </span>
                 {tw.short}
@@ -140,41 +141,23 @@ export default function HeroWorldRemote() {
             );
           })}
         </div>
-
-        <button
-          type="button"
-          onClick={() => setStopped((s) => !s)}
-          aria-label={stopped ? "Play world slideshow" : "Pause world slideshow"}
-          aria-pressed={stopped}
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-cream transition-transform duration-[120ms] active:scale-[0.94] sm:h-10 sm:w-10"
-        >
-          {stopped ? (
-            <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
-              <path d="M6 4l10 6-10 6z" fill="currentColor" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
-              <rect x="5" y="4" width="3.5" height="12" rx="1" fill="currentColor" />
-              <rect x="11.5" y="4" width="3.5" height="12" rx="1" fill="currentColor" />
-            </svg>
-          )}
-        </button>
         </div>
       </motion.div>
 
       {/* World line */}
       <div className="relative z-20 mt-5 px-6 text-center" aria-live="polite">
         <AnimatePresence mode="wait">
-          <motion.p
+          <motion.div
             key={w.id}
             initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -6, transition: { duration: 0.12 } }}
             transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1], delay: 0.15 }}
-            className="text-[15px] font-semibold leading-snug text-cream sm:text-[18px]"
+            className="flex flex-col items-center gap-1"
           >
-            <span className="font-display text-sun">{w.game}</span> — {w.tagline}
-          </motion.p>
+            <p className="font-display text-[20px] leading-none text-sun sm:text-[26px]">{w.game}</p>
+            <p className="text-[15px] font-semibold leading-snug text-cream sm:text-[18px]">{w.tagline}</p>
+          </motion.div>
         </AnimatePresence>
       </div>
       </div>
@@ -207,6 +190,18 @@ export default function HeroWorldRemote() {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Soft hand-off into the cream section below instead of a hard edge:
+          a tall fade behind the cast melts the world colour into cream, and a short fade
+          over the cast's feet so they sink into the page rather than being sliced off. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[clamp(56px,9svh,96px)] bg-[linear-gradient(to_bottom,transparent,color-mix(in_srgb,var(--color-cream)_20%,transparent)_60%,var(--color-cream))]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-50 h-[clamp(14px,2.5svh,24px)] bg-linear-to-b from-transparent to-cream"
+      />
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import { storyFull } from "@/content/site";
 import { Particle } from "../portal/particles";
-import Oodle from "../ui/Oodle";
+import PlaytestScene from "../ui/PlaytestScene";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
@@ -75,7 +75,7 @@ export default function StoryModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-cream text-ink shadow-[0_4px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:shadow-none sm:right-5 sm:top-5"
+          className="absolute right-4 top-4 z-20 grid h-11 w-11 place-items-center btn-soft rounded-full bg-cream text-ink transition-[transform,box-shadow] duration-[120ms] active:translate-y-[4px] active:[--btn-depth:0px] sm:right-5 sm:top-5"
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
             <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
@@ -103,14 +103,12 @@ export default function StoryModal({ onClose }: { onClose: () => void }) {
                 animate={{ rotate: 4, y: 0, opacity: 1 }}
                 transition={{ type: "spring", duration: 0.8, bounce: 0.3, delay: 0.15 }}
               >
-                <div className="relative rounded-[8px] border-[3px] border-ink bg-cream p-[6%] pb-[18%] shadow-[0_8px_0_0_rgb(30_34_45/0.5)]">
-                  <span aria-hidden className="absolute -top-3 left-1/2 h-6 w-20 -translate-x-1/2 -rotate-3 rounded-sm bg-sun/85" />
-                  <div className="relative aspect-square overflow-hidden rounded-[5px] border-2 border-ink bg-lilac">
-                    <div aria-hidden className="absolute inset-x-0 bottom-0 h-[26%] border-t-2 border-ink bg-ochre" />
-                    <Oodle world="biz" shape="clover" className="absolute bottom-[10%] left-[8%] h-auto w-[50%]" sizes="120px" />
-                    <Oodle world="money" shape="coin" className="absolute bottom-[10%] right-[8%] h-auto w-[34%]" sizes="90px" />
+                <div className="card-soft relative rounded-[8px] bg-cream p-[6%] pb-[18%] shadow-[0_2px_6px_-2px_rgb(0_0_0/0.2),0_22px_40px_-20px_rgb(0_0_0/0.5)]">
+                  <span aria-hidden className="absolute -top-3 left-1/2 z-10 h-6 w-20 -translate-x-1/2 -rotate-3 rounded-sm bg-sun/85" />
+                  <div className="relative aspect-[4/4.2] overflow-hidden rounded-[5px]">
+                    <PlaytestScene detailed={false} className="absolute inset-0 h-full w-full" />
                   </div>
-                  <p className="absolute inset-x-0 bottom-[4%] text-center font-display text-[15px] text-ink">Olinda &amp; Orai</p>
+                  <p className="absolute inset-x-0 bottom-[4%] text-center font-display text-[15px] text-ink">Playtest #1</p>
                 </div>
               </motion.div>
             </div>
@@ -146,10 +144,7 @@ export default function StoryModal({ onClose }: { onClose: () => void }) {
           <article className="mx-auto max-w-[680px] px-6 py-10 sm:px-10 sm:py-12">
             {storyFull.chapters.map((c, i) => (
               <section key={c.title} className={i ? "mt-10" : ""}>
-                <h3 className="flex items-center gap-3 font-display text-[clamp(1.35rem,2.4vw,1.8rem)] leading-none">
-                  <span className="tabular grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 border-ink bg-sun font-sans text-[13px] font-bold">
-                    {i + 1}
-                  </span>
+                <h3 className="font-display text-[clamp(1.35rem,2.4vw,1.8rem)] leading-none">
                   {c.title}
                 </h3>
                 <div className="mt-4 space-y-4 text-[clamp(1rem,1.25vw,1.08rem)] leading-[1.75] text-ink/80">

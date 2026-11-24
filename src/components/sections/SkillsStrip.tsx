@@ -63,7 +63,7 @@ export default function SkillsStrip() {
                 viewport={{ once: true, margin: "0px 0px -12% 0px" }}
                 animate={{ flexGrow: isOpen ? 2.3 : 1 }}
                 transition={{ ...SPRING, delay: i * 0.08, flexGrow: { duration: 0.65, ease: SMOOTH_EASE } }}
-                className={`group relative flex min-h-[260px] flex-col overflow-hidden [container-type:inline-size] rounded-[28px] border-[3px] border-ink ${p.bg} p-5 text-cream shadow-[0_10px_0_0_var(--color-ink)] outline-none sm:min-h-[300px] sm:rounded-[32px] sm:p-7 lg:h-full lg:min-h-0 lg:basis-0`}
+                className={`group relative flex min-h-[260px] flex-col overflow-hidden [container-type:inline-size] rounded-[28px] ${p.bg} p-5 text-cream shadow-[0_2px_6px_-2px_rgb(30_34_45/0.15),0_22px_44px_-22px_rgb(30_34_45/0.55)] outline-none focus-visible:ring-4 focus-visible:ring-sun/70 sm:min-h-[300px] sm:rounded-[32px] sm:p-7 lg:h-full lg:min-h-0 lg:basis-0`}
               >
                 <motion.div
                   className="absolute inset-0"
@@ -81,10 +81,10 @@ export default function SkillsStrip() {
 
                 <div className="relative z-10 flex items-start justify-between gap-3">
                   <div className="relative min-w-0 flex-1">
-                    <span className={`inline-block rounded-full border-2 border-ink px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${p.chip}`}>
+                    <span className="block text-[12px] font-bold uppercase tracking-[0.16em] text-cream/90 drop-shadow-[0_1px_2px_rgb(0_0_0/0.45)]">
                       {p.game}
                     </span>
-                    <h3 className="mt-3 font-display text-[min(clamp(2rem,3.8vw,3.5rem),14cqw)] leading-[0.95] text-sun [-webkit-text-stroke:0.06em_var(--color-ink)] [paint-order:stroke_fill] [text-shadow:0_3px_0_var(--color-ink)]">
+                    <h3 className="mt-2 font-display text-[min(clamp(2rem,3.8vw,3.5rem),14cqw)] leading-[0.95] text-sun [-webkit-text-stroke:0.06em_var(--color-ink)] [paint-order:stroke_fill] [text-shadow:0_3px_8px_rgb(30_34_45/0.35)]">
                       {p.title}
                     </h3>
                     <AnimatePresence initial={false}>
@@ -102,25 +102,23 @@ export default function SkillsStrip() {
                       )}
                     </AnimatePresence>
                   </div>
-                  <span className="flex shrink-0 items-center gap-2">
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.span
-                        initial={{ opacity: 0, x: 8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, transition: { duration: 0.12 } }}
-                        transition={{ duration: 0.35, ease: SMOOTH_EASE, delay: 0.15 }}
-                        className="hidden whitespace-nowrap rounded-full border-2 border-ink bg-cream px-3 py-1.5 text-[12px] font-bold text-ink sm:inline-block"
-                      >
-                        See game details
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-ink bg-cream text-ink transition-transform duration-300 ease-(--ease-out) group-hover:-rotate-12 sm:h-11 sm:w-11">
-                    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden>
+                  {/* Plain text link (no capsule): underline + a small arrow that nudges on hover */}
+                  <span
+                    className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap pt-0.5 text-[13px] font-bold text-cream drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)] transition-opacity duration-300 sm:text-[14px] ${
+                      isOpen ? "opacity-100" : "lg:opacity-0"
+                    }`}
+                  >
+                    <span className="underline decoration-cream/45 decoration-2 underline-offset-[5px] transition-[text-decoration-color] duration-200 group-hover:decoration-sun">
+                      See game details
+                    </span>
+                    <svg
+                      viewBox="0 0 20 20"
+                      className="h-4 w-4 transition-transform duration-300 ease-(--ease-out) group-hover:translate-x-1"
+                      fill="none"
+                      aria-hidden
+                    >
                       <path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  </span>
                   </span>
                 </div>
 

@@ -9,7 +9,7 @@ const TONES: Record<Tone, string> = {
 };
 
 /**
- * Chunky outlined pill with a hard ink shadow that presses flat on :active (120ms).
+ * Chunky pill with a soft edge + translucent press ledge (see .btn-soft) that presses flat on :active (120ms).
  */
 export function Button({
   href,
@@ -37,7 +37,7 @@ export function Button({
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : undefined}
       onClick={onClick}
-      className={`group inline-flex items-center justify-between whitespace-nowrap rounded-full border-[2.5px] border-ink font-semibold shadow-[0_5px_0_0_var(--color-ink)] transition-[transform,box-shadow] duration-[120ms] ease-(--ease-out) active:translate-y-[5px] active:shadow-[0_0_0_0_var(--color-ink)] [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5 [@media(hover:hover)_and_(pointer:fine)]:hover:shadow-[0_7px_0_0_var(--color-ink)] ${TONES[tone]} ${sizes} ${disabled ? "pointer-events-none opacity-55 saturate-50" : ""} ${className}`}
+      className={`group inline-flex items-center justify-between whitespace-nowrap btn-soft rounded-full font-semibold [--btn-depth:5px] transition-[transform,box-shadow] duration-[120ms] ease-(--ease-out) active:translate-y-[5px] active:[--btn-depth:0px] [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5 [@media(hover:hover)_and_(pointer:fine)]:hover:[--btn-depth:7px] ${TONES[tone]} ${sizes} ${disabled ? "pointer-events-none opacity-55 saturate-50" : ""} ${className}`}
     >
       {children}
       <span

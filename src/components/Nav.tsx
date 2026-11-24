@@ -62,8 +62,12 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
         <nav
           aria-label="Main"
-          className={`mx-auto flex h-16 max-w-[1320px] items-center justify-between rounded-full border-[2.5px] pl-5 pr-2 transition-[background-color,border-color,box-shadow] duration-300 ease-(--ease-out) ${
-            scrolled ? "border-ink bg-cream shadow-[0_5px_0_0_var(--color-ink)]" : "border-transparent bg-transparent"
+          className={`mx-auto flex h-16 max-w-[1320px] items-center justify-between rounded-[20px] border pl-5 pr-2 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-(--ease-out) ${
+            scrolled
+              ? // Frosted rounded box (echoes the "learn" tag in the logo): translucent cream + blur,
+                // a hairline edge and a wide, feathered shadow so it melts into the page.
+                "border-ink/[0.06] bg-cream/80 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.45),0_8px_28px_-10px_rgb(30_34_45/0.22),0_2px_6px_-2px_rgb(30_34_45/0.08)] backdrop-blur-md backdrop-saturate-150"
+              : "border-transparent bg-transparent"
           }`}
         >
           <Wordmark light={onDark && !scrolled} />
@@ -84,6 +88,12 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
           </ul>
 
           <div className="flex items-center gap-2">
+            {/* desktop-wide only: below xl the "Freebie Factory" link + mobile menu cover it */}
+            <div className="hidden pb-[5px] xl:block">
+              <Button href={to(nav.freebie.href)} size="sm" tone="cream">
+                {nav.freebie.label}
+              </Button>
+            </div>
             <div className="hidden pb-[5px] sm:block">
               <Button href={to(nav.cta.href)} size="sm">
                 {nav.cta.label}
@@ -95,7 +105,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label="Open menu"
-              className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-sun transition-transform duration-[120ms] active:scale-[0.95] lg:hidden"
+              className="grid h-11 w-11 place-items-center btn-soft rounded-full bg-sun [--btn-depth:3px] transition-transform duration-[120ms] active:scale-[0.95] lg:hidden"
             >
               <span className="flex flex-col gap-[5px]" aria-hidden>
                 <span className="h-[2.5px] w-5 rounded-full bg-ink" />
@@ -124,7 +134,7 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
-                className="grid h-11 w-11 place-items-center rounded-full border-[2.5px] border-ink bg-cream text-ink active:scale-[0.95]"
+                className="grid h-11 w-11 place-items-center btn-soft rounded-full bg-cream text-ink [--btn-depth:3px] active:scale-[0.95]"
               >
                 <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
                   <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
@@ -148,13 +158,16 @@ export default function Nav({ onDark = false }: { onDark?: boolean }) {
                 </motion.li>
               ))}
             </ul>
-            <div className="mt-auto">
-              <Button href={to(nav.cta.href)} className="w-full">
+            <div className="relative z-10 mt-auto flex flex-col gap-3">
+              <Button href={to(nav.freebie.href)} tone="cream" className="w-full" onClick={() => setOpen(false)}>
+                {nav.freebie.label}
+              </Button>
+              <Button href={to(nav.cta.href)} className="w-full" onClick={() => setOpen(false)}>
                 {nav.cta.label}
               </Button>
             </div>
-            <Oodle world="solve" shape="star" className="pointer-events-none absolute -right-4 bottom-28 h-36 w-auto rotate-12" />
-            <Oodle world="money" shape="coin" className="pointer-events-none absolute bottom-24 right-28 h-20 w-auto -rotate-6" />
+            <Oodle world="solve" shape="star" className="pointer-events-none absolute -right-4 bottom-44 h-36 w-auto rotate-12" />
+            <Oodle world="money" shape="coin" className="pointer-events-none absolute bottom-40 right-28 h-20 w-auto -rotate-6" />
           </motion.div>
         )}
       </AnimatePresence>
