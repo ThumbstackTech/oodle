@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useEffect, useRef, useSyncExternalStore, type KeyboardEvent } from "react";
-import type { GameDetail, Shape } from "@/content/site";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import type { GameDetail, GameImage, Shape } from "@/content/site";
 import { Particle } from "../portal/particles";
 import { Button } from "../ui/Button";
 import Oodle from "../ui/Oodle";
@@ -38,6 +38,81 @@ function SectionTitle({ children, className = "" }: { children: React.ReactNode;
   return <h3 className={`font-display text-[clamp(1.45rem,2.6vw,2.1rem)] leading-[1] text-ink ${className}`}>{children}</h3>;
 }
 
+/** A product photo that opens full-size on click. */
+function PhotoButton({
+  img,
+  sizes,
+  onOpen,
+  className = "",
+}: {
+  img: GameImage;
+  sizes: string;
+  onOpen: (img: GameImage) => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(img)}
+      aria-label={`Enlarge photo: ${img.alt}`}
+      className={`group card-soft relative block w-full cursor-zoom-in overflow-hidden rounded-[20px] bg-ink/5 outline-none focus-visible:ring-4 focus-visible:ring-sun/70 ${className}`}
+    >
+      <Image
+        src={img.src}
+        alt={img.alt}
+        fill
+        sizes={sizes}
+        className="object-cover transition-transform duration-500 ease-(--ease-out) group-hover:scale-[1.04]"
+      />
+    </button>
+  );
+}
+
+/** Full-size view of a product photo, layered over the modal. Esc / click closes it (not the modal). */
+function Lightbox({ img, onClose }: { img: GameImage; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeRef.current?.focus({ preventScroll: true });
+    // Capture phase so Esc closes only the photo, not the whole game modal.
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.stopPropagation();
+      onClose();
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      className="absolute inset-0 z-30 flex items-center justify-center bg-ink/90 p-4 sm:p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { duration: 0.2 } }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      onClick={onClose}
+    >
+      <button
+        ref={closeRef}
+        type="button"
+        onClick={onClose}
+        aria-label="Close photo"
+        className="absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full bg-cream text-ink sm:right-5 sm:top-5"
+      >
+        <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden>
+          <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+        </svg>
+      </button>
+      <motion.div
+        className="relative h-full w-full"
+        initial={{ scale: 0.96 }}
+        animate={{ scale: 1, transition: { type: "spring", duration: 0.4, bounce: 0.15 } }}
+      >
+        <Image src={img.src} alt={img.alt} fill sizes="(min-width: 1080px) 1080px, 100vw" className="object-contain" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /**
  * Game details modal. Desktop: centred dialog; mobile: bottom sheet. World-coloured header with the
  * game's cast, then every section from the copy doc, and a sticky buy bar.
@@ -56,6 +131,9 @@ export default function GameModal({
   const closeRef = useRef<HTMLButtonElement>(null);
   const titleId = `game-modal-${game.world}`;
   const tiles = TILE[game.world];
+  const [zoom, setZoom] = useState<GameImage | null>(null);
+  const closeZoom = useCallback(() => setZoom(null), []);
+  const { images } = game;
 
   // Lock page scroll (native + Lenis), Esc to close, focus the close button.
   useEffect(() => {
@@ -138,7 +216,8 @@ export default function GameModal({
               className="absolute inset-0"
               style={{ background: `radial-gradient(ellipse 80% 75% at 18% 22%, ${theme.hex} 40%, transparent 85%), linear-gradient(to top, ${theme.hex} 8%, transparent 45%)` }}
             />
-            <div className="relative pr-12">
+            <div className="relative grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,44%)] sm:gap-8 sm:pr-14">
+            <div className="pr-12 sm:pr-0">
               <h2
                 id={titleId}
                 aria-label={`${game.name} by Oodle Learn`}
@@ -152,6 +231,20 @@ export default function GameModal({
                 <Image src="/brand/logo-light.svg" alt="" width={99} height={44} className="h-[clamp(34px,4vw,44px)] w-auto drop-shadow-[0_2px_4px_rgb(0_0_0/0.25)]" />
               </div>
               <p className="mt-3 text-[clamp(1rem,1.6vw,1.25rem)] font-semibold text-cream drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]">{game.tagline}</p>
+            </div>
+            {/* The box — client product shot */}
+            <motion.div
+              initial={{ opacity: 0, y: 24, rotate: 0 }}
+              animate={{ opacity: 1, y: 0, rotate: 2 }}
+              transition={{ type: "spring", duration: 0.7, bounce: 0.25, delay: 0.1 }}
+            >
+              <PhotoButton
+                img={images.box}
+                sizes="(min-width: 1080px) 420px, (min-width: 640px) 44vw, 90vw"
+                onOpen={setZoom}
+                className="aspect-[3/2] border-4 border-cream shadow-[0_24px_48px_-20px_rgb(0_0_0/0.6)]"
+              />
+            </motion.div>
             </div>
             {/* the cast */}
             <div className="relative mt-6 flex items-end justify-center gap-[1.5%] sm:mt-8">
@@ -181,6 +274,23 @@ export default function GameModal({
                   <p key={p}>{p}</p>
                 ))}
               </div>
+            </section>
+
+            {/* Photo gallery — lead lifestyle shot large, the rest alongside */}
+            <section>
+              <SectionTitle>See it in play</SectionTitle>
+              <ul className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3 lg:grid-rows-2">
+                {images.gallery.map((img, i) => (
+                  <li key={img.src} className={i === 0 ? "col-span-2 lg:row-span-2" : ""}>
+                    <PhotoButton
+                      img={img}
+                      sizes={i === 0 ? "(min-width: 1080px) 680px, 90vw" : "(min-width: 1080px) 330px, 45vw"}
+                      onOpen={setZoom}
+                      className={i === 0 ? "aspect-[3/2] lg:aspect-auto lg:h-full" : "aspect-[3/2]"}
+                    />
+                  </li>
+                ))}
+              </ul>
             </section>
 
             {/* Quick facts */}
@@ -270,6 +380,18 @@ export default function GameModal({
                     </li>
                   ))}
                 </ul>
+                {/* Cards / tokens close-ups */}
+                <div className={`mt-4 grid gap-3 ${images.components.length > 1 ? "grid-cols-2" : ""}`}>
+                  {images.components.map((img) => (
+                    <PhotoButton
+                      key={img.src}
+                      img={img}
+                      sizes={images.components.length > 1 ? "(min-width: 1080px) 200px, 45vw" : "(min-width: 1080px) 400px, 90vw"}
+                      onOpen={setZoom}
+                      className="aspect-[3/2]"
+                    />
+                  ))}
+                </div>
               </section>
               <section className="lg:col-span-7">
                 <SectionTitle>{game.practiseTitle}</SectionTitle>
@@ -313,6 +435,8 @@ export default function GameModal({
             Close
           </button>
         </div>
+
+        <AnimatePresence>{zoom && <Lightbox key={zoom.src} img={zoom} onClose={closeZoom} />}</AnimatePresence>
       </motion.div>
     </div>
   );

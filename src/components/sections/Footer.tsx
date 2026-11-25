@@ -183,8 +183,24 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Agency credit: "A Thumbstack. Website" */}
+          <p className="relative flex items-baseline gap-[0.35em] px-6 pt-9 text-[clamp(16px,1.4vw,19px)] font-medium leading-none text-cream sm:px-10 sm:pt-10 lg:px-14">
+            A
+            {/* logo cap height ≈ Poppins cap height (~0.7em); sits on the text baseline */}
+            <a
+              href="https://thumbstack.co"
+              target="_blank"
+              rel="noopener"
+              aria-label="Thumbstack (opens in a new tab)"
+              className="self-baseline rounded-sm opacity-100 outline-none transition-opacity duration-200 hover:opacity-75 focus-visible:ring-2 focus-visible:ring-sun focus-visible:ring-offset-4 focus-visible:ring-offset-slate"
+            >
+              <Image src="/brand/thumbstack.svg" alt="Thumbstack" width={84} height={11} className="block h-[0.72em] w-auto" />
+            </a>
+            Website
+          </p>
+
           {/* Bottom bar */}
-          <div className="relative flex flex-col gap-3 px-6 pb-5 pt-9 sm:pt-10 text-[13px] text-cream/75 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-14">
+          <div className="relative mt-6 flex flex-col gap-3 border-t border-cream/15 px-6 pb-5 pt-5 text-[13px] text-cream/75 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-14">
             <p>© 2026 Oodle Learn</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {footer.legal.map((l) => (

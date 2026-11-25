@@ -544,7 +544,18 @@ export type GameDetail = {
   buyLabel: string;
   /** Amazon link — add later */
   buyHref: string;
+  /** Client product photography (public/products/<world>/). */
+  images: {
+    /** Box front — hero shot in the modal header */
+    box: GameImage;
+    /** Cards / tokens close-ups — shown with "What's inside the box?" */
+    components: GameImage[];
+    /** "See it in play": lead lifestyle shot (shown large), second lifestyle shot, back of the box */
+    gallery: GameImage[];
+  };
 };
+
+export type GameImage = { src: string; alt: string; width: number; height: number };
 
 export const gameDetails: Record<World, GameDetail> = {
   money: {
@@ -596,6 +607,18 @@ export const gameDetails: Record<World, GameDetail> = {
     ],
     buyLabel: "Get Master Money",
     buyHref: "",
+    images: {
+      box: { src: "/products/money/front.png", alt: "The Master Money game box by Oodle Learn", width: 1536, height: 1024 },
+      components: [
+        { src: "/products/money/cards.png", alt: "Master Money action cards: a card deck and two Earn cards", width: 1536, height: 1024 },
+        { src: "/products/money/tokens.png", alt: "Master Money coins from ₹50 to ₹500, plus heads and tails tokens", width: 1536, height: 1024 },
+      ],
+      gallery: [
+        { src: "/products/money/lifestyle-2.png", alt: "Three children laughing as they play Master Money at a table", width: 1536, height: 1024 },
+        { src: "/products/money/lifestyle-1.png", alt: "A family playing Master Money together with cards and coins", width: 1080, height: 724 },
+        { src: "/products/money/back.png", alt: "The back of the Master Money box", width: 1080, height: 724 },
+      ],
+    },
   },
   solve: {
     world: "solve",
@@ -649,6 +672,15 @@ export const gameDetails: Record<World, GameDetail> = {
     ],
     buyLabel: "Get Master Solutions",
     buyHref: "",
+    images: {
+      box: { src: "/products/solve/front.png", alt: "The Master Solutions game box by Oodle Learn", width: 1536, height: 1024 },
+      components: [{ src: "/products/solve/cards.png", alt: "A Master Solutions problem card deck and Strength Tokens", width: 1536, height: 1024 }],
+      gallery: [
+        { src: "/products/solve/lifestyle-2.png", alt: "A family playing Master Solutions together at a table", width: 2528, height: 1696 },
+        { src: "/products/solve/lifestyle-1.png", alt: "Three children playing Master Solutions with problem cards and tokens", width: 1536, height: 1024 },
+        { src: "/products/solve/back.png", alt: "The back of the Master Solutions box", width: 1536, height: 1024 },
+      ],
+    },
   },
   biz: {
     world: "biz",
@@ -703,6 +735,15 @@ export const gameDetails: Record<World, GameDetail> = {
     ],
     buyLabel: "Get Master Biz",
     buyHref: "",
+    images: {
+      box: { src: "/products/biz/front.png", alt: "The Master Biz game box by Oodle Learn", width: 1536, height: 1024 },
+      components: [{ src: "/products/biz/cards.png", alt: "Master Biz Opportunity and Market cards with Success Tokens", width: 1536, height: 1024 }],
+      gallery: [
+        { src: "/products/biz/lifestyle-1.png", alt: "A family playing Master Biz together at a table", width: 2400, height: 1792 },
+        { src: "/products/biz/lifestyle-2.png", alt: "Three children playing Master Biz with opportunity and market cards", width: 2400, height: 1792 },
+        { src: "/products/biz/back.png", alt: "The back of the Master Biz box", width: 1536, height: 1024 },
+      ],
+    },
   },
 };
 
